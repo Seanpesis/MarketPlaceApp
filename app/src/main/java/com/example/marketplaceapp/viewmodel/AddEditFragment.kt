@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
@@ -52,6 +53,11 @@ class AddEditFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val categories = arrayOf("Books", "Clothing", "Art", "Technology")
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categories)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.spinnerCategory.adapter = adapter
+
         val isEditMode = args.itemId != -1L
 
         if (isEditMode) {
@@ -65,6 +71,11 @@ class AddEditFragment : Fragment() {
                     if (it.imageUri != null) {
                         selectedImageUri = Uri.parse(it.imageUri)
                         Glide.with(this).load(selectedImageUri).into(binding.ivPreview)
+                    }
+
+                    val categoryIndex = categories.indexOf(it.category)
+                    if (categoryIndex >= 0) {
+                        binding.spinnerCategory.setSelection(categoryIndex)
                     }
                 }
             }
@@ -84,6 +95,7 @@ class AddEditFragment : Fragment() {
         val desc = binding.etDescription.text.toString()
         val priceStr = binding.etPrice.text.toString()
         val phone = binding.etPhone.text.toString()
+        val selectedCategory = binding.spinnerCategory.selectedItem.toString()
 
         if (title.isBlank() || desc.isBlank() || priceStr.isBlank() || phone.isBlank()) {
             Toast.makeText(context, R.string.fill_fields, Toast.LENGTH_SHORT).show()
@@ -99,7 +111,8 @@ class AddEditFragment : Fragment() {
             description = desc,
             price = price,
             contactPhone = phone,
-            imageUri = imageString
+            imageUri = imageString ,
+            category = selectedCategory
         )
 
         if (isEditMode) {
