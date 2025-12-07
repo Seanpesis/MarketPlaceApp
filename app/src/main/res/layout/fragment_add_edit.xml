@@ -26,6 +26,7 @@
             android:layout_marginTop="8dp"
             android:text="@string/select_image" />
 
+
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -38,6 +39,14 @@
                 android:layout_height="wrap_content"
                 android:inputType="textCapWords" />
         </com.google.android.material.textfield.TextInputLayout>
+
+<!--        לורן הוסיפה, כדי לבחור קטגוריה למוצר לסינון-->
+        <Spinner
+            android:id="@+id/spinnerCategory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:minHeight="48dp" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
@@ -86,6 +95,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="@string/save" />
+
+
 
     </LinearLayout>
 </ScrollView>
