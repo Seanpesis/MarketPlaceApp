@@ -40,7 +40,7 @@
                 android:inputType="textCapWords" />
         </com.google.android.material.textfield.TextInputLayout>
 
-<!--        לורן הוסיפה, כדי לבחור קטגוריה למוצר לסינון-->
+<!--  כדי לבחור קטגוריה למוצר לסינון-->
         <Spinner
             android:id="@+id/spinnerCategory"
             android:layout_width="match_parent"

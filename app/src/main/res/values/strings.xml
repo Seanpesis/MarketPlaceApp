@@ -13,4 +13,23 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="fill_fields">Please fill all fields</string>
+
+<!--    Home Page-->
+    <!--    Tool Bar-->
+    <string name="all_btn">All</string>
+    <string name="books_btn">Books</string>
+    <string name="clothing_btn">Clothing</string>
+    <string name="art_btn">Art</string>
+
+<!--    Item's name-->
+    <string name="high_heels">High Heels</string>
+    <string name="the_little_prince">The Little Prince</string>
+    <string name="macbook">MackBook</string>
+    <string name="monet_painting">Irises By Monet</string>
+
+<!--        Item's prices-->
+    <string name="forty_five">45$</string>
+    <string name="ten">10$</string>
+    <string name="five_hundred">500$</string>
+    <string name="one_thousand">1000$</string>
 </resources>
