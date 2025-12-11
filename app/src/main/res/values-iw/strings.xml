@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">שוק</string>
+    <string name="title">כותרת</string>
+    <string name="price">מחיר</string>
+    <string name="description">תיאור</string>
+    <string name="phone">טלפון</string>
+    <string name="save">שמור</string>
+    <string name="edit">ערוך</string>
+    <string name="select_image">בחר תמונה</string>
+    <string name="contact_info">פרטי קשר</string>
+    <string name="fill_fields">אנא מלא את כל השדות</string>
+
+    <!-- Delete Dialog -->
+    <string name="delete_dialog_title">מחק פריט</string>
+    <string name="delete_dialog_message">האם אתה בטוח שברצונך למחוק את \"%1$s\"?</string>
+    <string name="delete_confirm">מחק</string>
+    <string name="cancel">ביטול</string>
+
+    <!-- Formatting -->
+    <string name="price_format">%1$s ₪</string>
+
+    <!-- Menu -->
+    <string name="about">אודות</string>
+</resources>
