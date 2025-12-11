@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
@@ -20,7 +20,7 @@ class AddEditFragment : Fragment() {
 
     private var _binding: FragmentAddEditBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: MarketViewModel by viewModels()
+    private val viewModel: MarketViewModel by activityViewModels()
     private val args: AddEditFragmentArgs by navArgs()
 
     private var selectedImageUri: Uri? = null
@@ -28,14 +28,13 @@ class AddEditFragment : Fragment() {
     private val pickImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let {
             selectedImageUri = it
-            // Attempt to persist permission if possible, though scoped storage handles this mostly
+            // This is critical for persistent access to the image URI
             try {
-                requireContext().contentResolver.takePersistableUriPermission(
-                    it,
-                    android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
-                )
-            } catch (e: Exception) {
-                // Ignore if not needed/possible
+                val flags = android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+                requireContext().contentResolver.takePersistableUriPermission(it, flags)
+            } catch (e: SecurityException) {
+                // This can happen on some devices/OS versions. We'll proceed without it.
+                e.printStackTrace()
             }
             Glide.with(this).load(it).into(binding.ivPreview)
         }
@@ -80,17 +79,23 @@ class AddEditFragment : Fragment() {
     }
 
     private fun saveItem(isEditMode: Boolean) {
-        val title = binding.etTitle.text.toString()
-        val desc = binding.etDescription.text.toString()
-        val priceStr = binding.etPrice.text.toString()
-        val phone = binding.etPhone.text.toString()
+        val title = binding.etTitle.text.toString().trim()
+        val desc = binding.etDescription.text.toString().trim()
+        val priceStr = binding.etPrice.text.toString().trim()
+        val phone = binding.etPhone.text.toString().trim()
 
         if (title.isBlank() || desc.isBlank() || priceStr.isBlank() || phone.isBlank()) {
             Toast.makeText(context, R.string.fill_fields, Toast.LENGTH_SHORT).show()
             return
         }
 
-        val price = priceStr.toDoubleOrNull() ?: 0.0
+        val price = priceStr.toDoubleOrNull()
+        if (price == null) {
+            // Optionally, show a more specific error for invalid price
+            Toast.makeText(context, "Please enter a valid price", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
         val imageString = selectedImageUri?.toString()
 
         val item = MarketItem(

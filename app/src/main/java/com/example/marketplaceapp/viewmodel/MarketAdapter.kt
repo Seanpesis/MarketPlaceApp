@@ -1,5 +1,6 @@
 package com.example.marketplaceapp
 
+import android.app.AlertDialog
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -36,18 +37,30 @@ class MarketAdapter(
             }
             binding.btnDelete.setOnClickListener {
                 if (adapterPosition != RecyclerView.NO_POSITION) {
-                    onDeleteClick(getItem(adapterPosition))
+                    val item = getItem(adapterPosition)
+                    val context = itemView.context
+                    AlertDialog.Builder(context)
+                        .setTitle(context.getString(R.string.delete_dialog_title))
+                        .setMessage(context.getString(R.string.delete_dialog_message, item.title))
+                        .setPositiveButton(context.getString(R.string.delete_confirm)) { _, _ ->
+                            onDeleteClick(item)
+                        }
+                        .setNegativeButton(context.getString(R.string.cancel), null)
+                        .show()
                 }
             }
         }
 
         fun bind(item: MarketItem) {
+            val context = itemView.context
             binding.tvTitle.text = item.title
-            binding.tvPrice.text = "${item.price} $"
+            binding.tvPrice.text = context.getString(R.string.price_format, item.price.toString())
 
             if (item.imageUri != null) {
-                Glide.with(itemView.context)
+                Glide.with(context)
                     .load(Uri.parse(item.imageUri))
+                    .placeholder(android.R.drawable.ic_menu_gallery)
+                    .error(android.R.drawable.ic_menu_gallery)
                     .into(binding.ivItemImage)
             } else {
                 binding.ivItemImage.setImageResource(android.R.drawable.ic_menu_gallery)
