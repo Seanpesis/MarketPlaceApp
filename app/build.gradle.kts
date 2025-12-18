@@ -52,8 +52,9 @@ dependencies {
     implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
-    implementation(libs.androidx.navigation.fragment.ktx)
-    implementation(libs.androidx.navigation.ui.ktx)
     ksp("androidx.room:room-compiler:2.6.1")
     implementation("com.github.bumptech.glide:glide:4.16.0")
+
+    // Google Play Services for location
+    implementation("com.google.android.gms:play-services-location:21.2.0")
 }

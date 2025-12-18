@@ -15,5 +15,7 @@ data class MarketItem(
     val price: Double,
     val contactPhone: String,
     val imageUri: String? = null,
-    val category: String = "General"
+    val category: String = "General",
+    val latitude: Double? = null,
+    val longitude: Double? = null
 ) : Parcelable

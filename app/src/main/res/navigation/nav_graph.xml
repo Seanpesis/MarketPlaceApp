@@ -7,8 +7,7 @@
 
     <fragment
         android:id="@+id/listFragment"
-        android:name="com.example.marketplaceapp.ListFragment"
-        android:label="Marketplace"
+        android:name="com.example.marketplaceapp.viewmodel.ListFragment"
         tools:layout="@layout/fragment_list">
         <action
             android:id="@+id/action_listFragment_to_addEditFragment"
@@ -23,7 +22,7 @@
 
     <fragment
         android:id="@+id/addEditFragment"
-        android:name="com.example.marketplaceapp.AddEditFragment"
+        android:name="com.example.marketplaceapp.viewmodel.AddEditFragment"
         android:label="Add/Edit Item"
         tools:layout="@layout/fragment_add_edit">
         <argument

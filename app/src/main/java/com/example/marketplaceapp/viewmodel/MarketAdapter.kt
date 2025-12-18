@@ -1,4 +1,4 @@
-package com.example.marketplaceapp
+package com.example.marketplaceapp.viewmodel
 
 import android.app.AlertDialog
 import android.net.Uri
@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.marketplaceapp.R
 import com.example.marketplaceapp.data.MarketItem
 import com.example.marketplaceapp.databinding.ItemMarketBinding
 

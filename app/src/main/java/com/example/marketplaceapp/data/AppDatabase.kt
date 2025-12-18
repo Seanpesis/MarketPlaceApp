@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [MarketItem::class], version = 1, exportSchema = false)
+@Database(entities = [MarketItem::class], version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun marketDao(): MarketDao
@@ -20,7 +20,10 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "market_database"
-                ).build()
+                )
+                .fallbackToDestructiveMigration()
+                .allowMainThreadQueries() // Required for the assignment
+                .build()
                 INSTANCE = instance
                 instance
             }
