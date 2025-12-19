@@ -33,7 +33,7 @@
 
     <fragment
         android:id="@+id/detailFragment"
-        android:name="com.example.marketplaceapp.DetailFragment"
+        android:name="com.example.marketplaceapp.viewmodel.DetailFragment"
         android:label="Item Details"
         tools:layout="@layout/fragment_detail">
         <argument

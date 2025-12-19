@@ -1,8 +1,10 @@
 package com.example.marketplaceapp.viewmodel
 
 import android.app.AlertDialog
+import android.location.Location
 import android.net.Uri
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -14,8 +16,14 @@ import com.example.marketplaceapp.databinding.ItemMarketBinding
 
 class MarketAdapter(
     private val onItemClick: (MarketItem) -> Unit,
-    private val onDeleteClick: (MarketItem) -> Unit
+    private val onDeleteClick: (MarketItem) -> Unit,
+    private var userLocation: Location?
 ) : ListAdapter<MarketItem, MarketAdapter.MarketViewHolder>(DiffCallback()) {
+
+    fun updateUserLocation(location: Location) {
+        userLocation = location
+        notifyDataSetChanged() // Re-bind all items to update distances
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MarketViewHolder {
         val binding = ItemMarketBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -57,14 +65,30 @@ class MarketAdapter(
             binding.tvTitle.text = item.title
             binding.tvPrice.text = context.getString(R.string.price_format, item.price.toString())
 
-            if (item.imageUri != null) {
+            // Display distance
+            if (userLocation != null && item.latitude != null && item.longitude != null) {
+                val itemLocation = Location("").apply {
+                    latitude = item.latitude
+                    longitude = item.longitude
+                }
+                val distanceInMeters = userLocation!!.distanceTo(itemLocation)
+                val distanceInKm = distanceInMeters / 1000
+                binding.tvDistance.text = String.format("%.1f km away", distanceInKm)
+                binding.tvDistance.visibility = View.VISIBLE
+            } else {
+                binding.tvDistance.visibility = View.GONE
+            }
+
+            // Load image
+            val imageUri = item.imageUri
+            if (imageUri != null) {
                 Glide.with(context)
-                    .load(Uri.parse(item.imageUri))
-                    .placeholder(android.R.drawable.ic_menu_gallery)
-                    .error(android.R.drawable.ic_menu_gallery)
+                    .load(Uri.parse(imageUri))
+                    .placeholder(R.drawable.market_icon)
+                    .error(R.drawable.market_icon)
                     .into(binding.ivItemImage)
             } else {
-                binding.ivItemImage.setImageResource(android.R.drawable.ic_menu_gallery)
+                binding.ivItemImage.setImageResource(R.drawable.market_icon)
             }
         }
     }

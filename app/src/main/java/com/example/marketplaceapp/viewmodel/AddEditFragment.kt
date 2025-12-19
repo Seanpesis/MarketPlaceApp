@@ -122,7 +122,7 @@ class AddEditFragment : Fragment() {
             Toast.makeText(context, "Please enter a valid price", Toast.LENGTH_SHORT).show()
             return
         }
-        
+
         val imageString = selectedImageUri?.toString()
 
         val item = MarketItem(

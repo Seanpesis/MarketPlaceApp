@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [MarketItem::class], version = 2, exportSchema = false)
+@Database(entities = [MarketItem::class], version = 3, exportSchema = false) // <--- INCREMENTED VERSION NUMBER
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun marketDao(): MarketDao
@@ -21,8 +21,10 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "market_database"
                 )
+                // Strategy for migration: if the schema changes, recreate the database.
+                // This is simple for development but data will be lost.
                 .fallbackToDestructiveMigration()
-                .allowMainThreadQueries() // Required for the assignment
+                .allowMainThreadQueries() // As per assignment requirements
                 .build()
                 INSTANCE = instance
                 instance
