@@ -19,6 +19,20 @@
     <!-- Formatting -->
     <string name="price_format">%1$s ₪</string>
 
+    <!--    Home Page Categories -->
+    <string name="all_btn">הכל</string>
+    <string name="books_btn">ספרים</string>
+    <string name="clothing_btn">בגדים</string>
+    <string name="art_btn">אומנות</string>
+
     <!-- Menu -->
     <string name="about">אודות</string>
+
+    <!-- Shopping Cart -->
+    <string name="shopping_cart">עגלת קניות</string>
+    <string name="proceed_to_payment">המשך לתשלום</string>
+    <string name="checkout_summary">סיכום הזמנה</string>
+    <string name="checkout_details">סה"כ פריטים: %1$d\nמחיר סופי: ₪%.2f</string>
+    <string name="ok">אישור</string>
+    <string name="total_price_format">סה"כ: ₪%.2f</string>
 </resources>

@@ -2,18 +2,22 @@ package com.example.marketplaceapp.viewmodel
 
 import android.os.Bundle
 import android.view.*
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marketplaceapp.R
+import com.example.marketplaceapp.data.CartManager
 import com.example.marketplaceapp.databinding.FragmentListBinding
+import com.google.android.material.snackbar.Snackbar
 
 class ListFragment : Fragment() {
 
     private var _binding: FragmentListBinding? = null
     private val binding get() = _binding!!
     private val viewModel: MarketViewModel by activityViewModels()
+    private var cartBadge: TextView? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -27,15 +31,17 @@ class ListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Pass the initial user location to the adapter
         val adapter = MarketAdapter(
             onItemClick = { item ->
                 val action = ListFragmentDirections.actionListFragmentToDetailFragment(item.id)
                 findNavController().navigate(action)
             },
             onDeleteClick = { item ->
-                // The dialog is handled in the adapter
                 viewModel.delete(item)
+            },
+            onAddToCartClick = { item ->
+                CartManager.addToCart(item)
+                Snackbar.make(binding.root, "${item.title} added to cart", Snackbar.LENGTH_SHORT).show()
             },
             userLocation = viewModel.currentLocation.value
         )
@@ -43,12 +49,10 @@ class ListFragment : Fragment() {
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
         binding.recyclerView.adapter = adapter
 
-        // Observe the sorted items list
         viewModel.sortedItems.observe(viewLifecycleOwner) { items ->
             items?.let { adapter.submitList(it) }
         }
 
-        // Observe the user's location and update the adapter when it changes
         viewModel.currentLocation.observe(viewLifecycleOwner) { location ->
             location?.let { adapter.updateUserLocation(it) }
         }
@@ -57,10 +61,23 @@ class ListFragment : Fragment() {
             val action = ListFragmentDirections.actionListFragmentToAddEditFragment(-1L)
             findNavController().navigate(action)
         }
+
+        CartManager.cartItems.observe(viewLifecycleOwner) { cartItems ->
+            updateCartBadge(cartItems.size)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.main_menu, menu)
+        val cartItem = menu.findItem(R.id.action_cart)
+        val actionView = cartItem.actionView
+        cartBadge = actionView?.findViewById(R.id.cart_badge)
+
+        actionView?.setOnClickListener {
+            onOptionsItemSelected(cartItem)
+        }
+
+        updateCartBadge(CartManager.cartItems.value?.size ?: 0)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -69,7 +86,20 @@ class ListFragment : Fragment() {
                 findNavController().navigate(ListFragmentDirections.actionListFragmentToAboutFragment())
                 true
             }
+            R.id.action_cart -> {
+                findNavController().navigate(ListFragmentDirections.actionListFragmentToCartFragment())
+                true
+            }
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun updateCartBadge(count: Int) {
+        if (count > 0) {
+            cartBadge?.visibility = View.VISIBLE
+            cartBadge?.text = count.toString()
+        } else {
+            cartBadge?.visibility = View.GONE
         }
     }
 

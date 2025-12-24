@@ -17,6 +17,7 @@ import com.example.marketplaceapp.databinding.ItemMarketBinding
 class MarketAdapter(
     private val onItemClick: (MarketItem) -> Unit,
     private val onDeleteClick: (MarketItem) -> Unit,
+    private val onAddToCartClick: (MarketItem) -> Unit, // Add this
     private var userLocation: Location?
 ) : ListAdapter<MarketItem, MarketAdapter.MarketViewHolder>(DiffCallback()) {
 
@@ -56,6 +57,11 @@ class MarketAdapter(
                         }
                         .setNegativeButton(context.getString(R.string.cancel), null)
                         .show()
+                }
+            }
+            binding.btnAddToCart.setOnClickListener { // Add this block
+                if (adapterPosition != RecyclerView.NO_POSITION) {
+                    onAddToCartClick(getItem(adapterPosition))
                 }
             }
         }

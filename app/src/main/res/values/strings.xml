@@ -25,4 +25,12 @@
     <string name="books_btn">Books</string>
     <string name="clothing_btn">Clothing</string>
     <string name="art_btn">Art</string>
+
+    <!-- Shopping Cart -->
+    <string name="shopping_cart">Shopping Cart</string>
+    <string name="proceed_to_payment">Proceed to Payment</string>
+    <string name="checkout_summary">Checkout Summary</string>
+    <string name="checkout_details">Total Items: %1$d\nTotal Price: $%2$d</string>
+    <string name="ok">OK</string>
+    <string name="total_price_format">Total: $%.2f</string>
 </resources>

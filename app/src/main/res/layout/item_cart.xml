@@ -13,26 +13,15 @@
         android:layout_height="wrap_content"
         android:padding="12dp">
 
-        <ImageView
-            android:id="@+id/ivItemImage"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:scaleType="centerCrop"
-            tools:src="@tools:sample/avatars"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
-
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
             android:textSize="18sp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toStartOf="@+id/btnAddToCart"
-            app:layout_constraintStart_toEndOf="@+id/ivItemImage"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/tvQuantity"
             tools:text="Item Title" />
 
         <TextView
@@ -47,33 +36,18 @@
             tools:text="$19.99" />
 
         <TextView
-            android:id="@+id/tvDistance"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textSize="12sp"
-            app:drawableStartCompat="@android:drawable/ic_dialog_map"
-            app:drawableTint="@android:color/darker_gray"
-            android:drawablePadding="4dp"
-            android:gravity="center_vertical"
-            app:layout_constraintStart_toStartOf="@+id/tvPrice"
-            app:layout_constraintTop_toBottomOf="@+id/tvPrice"
-            app:layout_constraintBottom_toBottomOf="parent"
-            tools:text="5.2 km away" />
-
-        <ImageButton
-            android:id="@+id/btnAddToCart"
+            android:id="@+id/tvQuantity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:padding="8dp"
-            app:srcCompat="@drawable/ic_add_shopping_cart"
-            app:layout_constraintEnd_toStartOf="@+id/btnDelete"
+            android:layout_marginStart="16dp"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toStartOf="@+id/btnRemove"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:text="Qty: 1" />
 
         <ImageButton
-            android:id="@+id/btnDelete"
+            android:id="@+id/btnRemove"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackgroundBorderless"

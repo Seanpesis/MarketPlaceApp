@@ -18,6 +18,9 @@
         <action
             android:id="@+id/action_listFragment_to_aboutFragment"
             app:destination="@id/aboutFragment" />
+        <action
+            android:id="@+id/action_listFragment_to_cartFragment"
+            app:destination="@id/cartFragment" />
     </fragment>
 
     <fragment
@@ -49,5 +52,11 @@
         android:name="com.example.marketplaceapp.AboutFragment"
         android:label="About"
         tools:layout="@layout/fragment_about" />
+
+    <fragment
+        android:id="@+id/cartFragment"
+        android:name="com.example.marketplaceapp.viewmodel.CartFragment"
+        android:label="Shopping Cart"
+        tools:layout="@layout/fragment_cart" />
 
 </navigation>
