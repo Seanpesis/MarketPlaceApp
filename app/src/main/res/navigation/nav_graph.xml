@@ -30,8 +30,8 @@
         tools:layout="@layout/fragment_add_edit">
         <argument
             android:name="itemId"
-            app:argType="long"
-            android:defaultValue="-1L" />
+            app:argType="string"
+            app:nullable="true" />
     </fragment>
 
     <fragment
@@ -41,7 +41,7 @@
         tools:layout="@layout/fragment_detail">
         <argument
             android:name="itemId"
-            app:argType="long" />
+            app:argType="string" />
         <action
             android:id="@+id/action_detailFragment_to_addEditFragment"
             app:destination="@id/addEditFragment" />

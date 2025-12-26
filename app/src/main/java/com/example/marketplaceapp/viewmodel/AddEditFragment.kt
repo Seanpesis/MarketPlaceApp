@@ -27,6 +27,7 @@ class AddEditFragment : Fragment() {
 
     private var selectedImageUri: Uri? = null
     private var itemLocation: Location? = null
+    private var currentItem: MarketItem? = null
 
     private val pickImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let {
@@ -57,11 +58,12 @@ class AddEditFragment : Fragment() {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerCategory.adapter = adapter
 
-        val isEditMode = args.itemId != -1L
+        val isEditMode = args.itemId != null
 
         if (isEditMode) {
-            viewModel.getItem(args.itemId).observe(viewLifecycleOwner) { item ->
+            viewModel.getItem(args.itemId!!).observe(viewLifecycleOwner) { item ->
                 item?.let {
+                    currentItem = it
                     binding.etTitle.setText(it.title)
                     binding.etDescription.setText(it.description)
                     binding.etPrice.setText(it.price.toString())
@@ -75,8 +77,8 @@ class AddEditFragment : Fragment() {
                     if (it.latitude != null && it.longitude != null) {
                         binding.tvLocationStatus.text = "Location Added"
                         itemLocation = Location("").apply {
-                            latitude = it.latitude
-                            longitude = it.longitude
+                            latitude = it.latitude!!
+                            longitude = it.longitude!!
                         }
                     }
 
@@ -125,8 +127,8 @@ class AddEditFragment : Fragment() {
 
         val imageString = selectedImageUri?.toString()
 
-        val item = MarketItem(
-            id = if (isEditMode) args.itemId else 0,
+        val itemToSave = MarketItem(
+            id = if (isEditMode) currentItem!!.id else "",
             title = title,
             description = desc,
             price = price,
@@ -138,9 +140,9 @@ class AddEditFragment : Fragment() {
         )
 
         if (isEditMode) {
-            viewModel.update(item)
+            viewModel.update(itemToSave)
         } else {
-            viewModel.insert(item)
+            viewModel.insert(itemToSave)
         }
 
         findNavController().popBackStack()

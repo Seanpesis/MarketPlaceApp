@@ -6,82 +6,93 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
-import com.example.marketplaceapp.data.AppDatabase
 import com.example.marketplaceapp.data.MarketItem
 import com.example.marketplaceapp.data.MarketRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class MarketViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository: MarketRepository
-
-    private val _allItems: LiveData<List<MarketItem>>
+    private val repository = MarketRepository()
+    private val _allItems = repository.getAllItems()
     private val _currentLocation = MutableLiveData<Location>()
+    private val _cartItems = MutableLiveData<MutableList<MarketItem>>(mutableListOf())
 
     val currentLocation: LiveData<Location> get() = _currentLocation
+    val cartItems: LiveData<MutableList<MarketItem>> get() = _cartItems
 
-    // This will hold the sorted list of items
-    val sortedItems = MediatorLiveData<List<MarketItem>>()
+    val finalItemList = MediatorLiveData<List<MarketItem>>()
 
     init {
-        val dao = AppDatabase.getDatabase(application).marketDao()
-        repository = MarketRepository(dao)
-        _allItems = repository.allItems
-
-        // Observe both the item list and the location for changes
-        sortedItems.addSource(_allItems) { items ->
-            sortItemsByDistance(items, _currentLocation.value)
-        }
-        sortedItems.addSource(_currentLocation) { location ->
-            sortItemsByDistance(_allItems.value, location)
-        }
+        finalItemList.addSource(_allItems) { items -> combineAndSort(items, _currentLocation.value, null) }
+        finalItemList.addSource(_currentLocation) { location -> combineAndSort(_allItems.value, location, null) }
     }
 
-    private fun sortItemsByDistance(items: List<MarketItem>?, location: Location?) {
-        if (items == null || location == null) {
-            sortedItems.value = items
+    private fun combineAndSort(items: List<MarketItem>?, location: Location?, category: String?) {
+        if (items == null) {
+            finalItemList.value = emptyList()
             return
         }
 
-        val sorted = items.sortedBy { item ->
-            if (item.latitude != null && item.longitude != null) {
-                val itemLocation = Location("").apply {
-                    latitude = item.latitude
-                    longitude = item.longitude
+        val filteredItems = if (category == null || category == "All") {
+            items
+        } else {
+            items.filter { it.category.equals(category, ignoreCase = true) }
+        }
+
+        val sortedItems = if (location == null) {
+            filteredItems
+        } else {
+            filteredItems.sortedBy { item ->
+                if (item.latitude != null && item.longitude != null) {
+                    val itemLocation = Location("").apply {
+                        latitude = item.latitude!!
+                        longitude = item.longitude!!
+                    }
+                    location.distanceTo(itemLocation)
+                } else {
+                    Float.MAX_VALUE
                 }
-                location.distanceTo(itemLocation)
-            } else {
-                Float.MAX_VALUE // Put items without location at the end
             }
         }
-        sortedItems.value = sorted
+        finalItemList.value = sortedItems
+    }
+
+    fun setFilter(category: String?) {
+        combineAndSort(_allItems.value, _currentLocation.value, category)
     }
 
     fun setCurrentLocation(location: Location) {
         _currentLocation.value = location
     }
 
-    fun getItem(id: Long): LiveData<MarketItem> {
+    fun getItem(id: String): LiveData<MarketItem> {
         return repository.getItem(id)
     }
 
     fun insert(item: MarketItem) {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.insert(item)
-        }
+        repository.insertItem(item)
     }
 
     fun update(item: MarketItem) {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.update(item)
-        }
+        repository.updateItem(item)
     }
 
     fun delete(item: MarketItem) {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.delete(item)
-        }
+        repository.deleteItem(item)
+    }
+
+    fun addToCart(item: MarketItem) {
+        val list = _cartItems.value ?: mutableListOf()
+        list.add(item)
+        _cartItems.value = list
+    }
+
+    fun removeFromCart(item: MarketItem) {
+        val list = _cartItems.value ?: mutableListOf()
+        list.remove(item)
+        _cartItems.value = list
+    }
+
+    fun clearCart() {
+        _cartItems.value = mutableListOf()
     }
 }

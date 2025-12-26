@@ -49,7 +49,6 @@ class DetailFragment : Fragment() {
                     binding.ivDetailImage.setImageResource(R.drawable.market_icon)
                 }
 
-                // Calculate and display distance
                 val userLocation = viewModel.currentLocation.value
                 if (userLocation != null && it.latitude != null && it.longitude != null) {
                     val itemLocation = Location("").apply {

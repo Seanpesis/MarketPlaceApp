@@ -70,7 +70,6 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
         } catch (e: SecurityException) {
-            // This should not happen if permission is granted, but as a fallback
             Toast.makeText(this, "Failed to get location due to security issue.", Toast.LENGTH_SHORT).show()
         }
     }

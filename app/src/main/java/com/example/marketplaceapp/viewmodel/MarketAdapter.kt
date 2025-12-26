@@ -1,6 +1,5 @@
 package com.example.marketplaceapp.viewmodel
 
-import android.app.AlertDialog
 import android.location.Location
 import android.net.Uri
 import android.view.LayoutInflater
@@ -16,14 +15,13 @@ import com.example.marketplaceapp.databinding.ItemMarketBinding
 
 class MarketAdapter(
     private val onItemClick: (MarketItem) -> Unit,
-    private val onDeleteClick: (MarketItem) -> Unit,
-    private val onAddToCartClick: (MarketItem) -> Unit, // Add this
+    private val onAddToCartClick: (MarketItem) -> Unit,
     private var userLocation: Location?
 ) : ListAdapter<MarketItem, MarketAdapter.MarketViewHolder>(DiffCallback()) {
 
     fun updateUserLocation(location: Location) {
         userLocation = location
-        notifyDataSetChanged() // Re-bind all items to update distances
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MarketViewHolder {
@@ -45,21 +43,7 @@ class MarketAdapter(
                     onItemClick(getItem(adapterPosition))
                 }
             }
-            binding.btnDelete.setOnClickListener {
-                if (adapterPosition != RecyclerView.NO_POSITION) {
-                    val item = getItem(adapterPosition)
-                    val context = itemView.context
-                    AlertDialog.Builder(context)
-                        .setTitle(context.getString(R.string.delete_dialog_title))
-                        .setMessage(context.getString(R.string.delete_dialog_message, item.title))
-                        .setPositiveButton(context.getString(R.string.delete_confirm)) { _, _ ->
-                            onDeleteClick(item)
-                        }
-                        .setNegativeButton(context.getString(R.string.cancel), null)
-                        .show()
-                }
-            }
-            binding.btnAddToCart.setOnClickListener { // Add this block
+            binding.btnAddToCart.setOnClickListener { 
                 if (adapterPosition != RecyclerView.NO_POSITION) {
                     onAddToCartClick(getItem(adapterPosition))
                 }
@@ -74,8 +58,8 @@ class MarketAdapter(
             // Display distance
             if (userLocation != null && item.latitude != null && item.longitude != null) {
                 val itemLocation = Location("").apply {
-                    latitude = item.latitude
-                    longitude = item.longitude
+                    latitude = item.latitude!!
+                    longitude = item.longitude!!
                 }
                 val distanceInMeters = userLocation!!.distanceTo(itemLocation)
                 val distanceInKm = distanceInMeters / 1000

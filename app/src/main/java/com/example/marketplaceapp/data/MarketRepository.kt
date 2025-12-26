@@ -1,24 +1,67 @@
 package com.example.marketplaceapp.data
 
+import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.toObjects
 
-class MarketRepository(private val marketDao: MarketDao) {
+class MarketRepository {
 
-    val allItems: LiveData<List<MarketItem>> = marketDao.getAllItems()
+    private val firestore = FirebaseFirestore.getInstance()
+    private val itemsCollection = firestore.collection("items")
 
-    fun getItem(id: Long): LiveData<MarketItem> {
-        return marketDao.getItemById(id)
+    fun getAllItems(): LiveData<List<MarketItem>> {
+        val liveData = MutableLiveData<List<MarketItem>>()
+        itemsCollection.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                Log.w("MarketRepository", "Listen failed.", error)
+                return@addSnapshotListener
+            }
+
+            if (snapshot != null) {
+                val items = snapshot.toObjects<MarketItem>()
+                liveData.value = items
+            } else {
+                liveData.value = emptyList()
+            }
+        }
+        return liveData
     }
 
-    suspend fun insert(item: MarketItem) {
-        marketDao.insertItem(item)
+    fun insertItem(item: MarketItem) {
+        itemsCollection.add(item)
+            .addOnSuccessListener { Log.d("MarketRepository", "Item added successfully") }
+            .addOnFailureListener { e -> Log.w("MarketRepository", "Error adding item", e) }
     }
 
-    suspend fun update(item: MarketItem) {
-        marketDao.updateItem(item)
+    fun updateItem(item: MarketItem) {
+        if (item.id.isNotEmpty()) {
+            itemsCollection.document(item.id).set(item)
+                .addOnSuccessListener { Log.d("MarketRepository", "Item updated successfully") }
+                .addOnFailureListener { e -> Log.w("MarketRepository", "Error updating item", e) }
+        }
     }
 
-    suspend fun delete(item: MarketItem) {
-        marketDao.deleteItem(item)
+    fun deleteItem(item: MarketItem) {
+        if (item.id.isNotEmpty()) {
+            itemsCollection.document(item.id).delete()
+                .addOnSuccessListener { Log.d("MarketRepository", "Item deleted successfully") }
+                .addOnFailureListener { e -> Log.w("MarketRepository", "Error deleting item", e) }
+        }
+    }
+    
+    fun getItem(itemId: String): LiveData<MarketItem> {
+        val itemLiveData = MutableLiveData<MarketItem>()
+        itemsCollection.document(itemId).addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                Log.w("MarketRepository", "Listen failed for single item.", error)
+                return@addSnapshotListener
+            }
+            if (snapshot != null && snapshot.exists()) {
+                itemLiveData.value = snapshot.toObject(MarketItem::class.java)
+            }
+        }
+        return itemLiveData
     }
 }
