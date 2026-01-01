@@ -41,6 +41,7 @@ class ListFragment : Fragment() {
         binding.recyclerView.layoutManager = GridLayoutManager(context, 2)
         binding.recyclerView.adapter = adapter
 
+        // Observe the final list which is filtered and sorted
         viewModel.finalItemList.observe(viewLifecycleOwner) { items ->
             items?.let { adapter.submitList(it) }
         }
@@ -54,6 +55,7 @@ class ListFragment : Fragment() {
             findNavController().navigate(action)
         }
 
+        // --- Filter Chip Listeners ---
         binding.chipGroup.setOnCheckedChangeListener { group, checkedId ->
             when (checkedId) {
                 R.id.btnFilterAll -> viewModel.setFilter(null)
