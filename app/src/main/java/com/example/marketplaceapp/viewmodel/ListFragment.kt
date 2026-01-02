@@ -2,6 +2,7 @@ package com.example.marketplaceapp.viewmodel
 
 import android.os.Bundle
 import android.view.*
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -14,6 +15,7 @@ class ListFragment : Fragment() {
     private var _binding: FragmentListBinding? = null
     private val binding get() = _binding!!
     private val viewModel: MarketViewModel by activityViewModels()
+    private var cartBadge: TextView? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,7 +43,6 @@ class ListFragment : Fragment() {
         binding.recyclerView.layoutManager = GridLayoutManager(context, 2)
         binding.recyclerView.adapter = adapter
 
-        // Observe the final list which is filtered and sorted
         viewModel.finalItemList.observe(viewLifecycleOwner) { items ->
             items?.let { adapter.submitList(it) }
         }
@@ -50,12 +51,15 @@ class ListFragment : Fragment() {
             location?.let { adapter.updateUserLocation(it) }
         }
 
+        viewModel.cartItems.observe(viewLifecycleOwner) { cartItems ->
+            updateCartBadge(cartItems.sumOf { it.quantity })
+        }
+
         binding.fabAdd.setOnClickListener {
             val action = ListFragmentDirections.actionListFragmentToAddEditFragment(null)
             findNavController().navigate(action)
         }
 
-        // --- Filter Chip Listeners ---
         binding.chipGroup.setOnCheckedChangeListener { group, checkedId ->
             when (checkedId) {
                 R.id.btnFilterAll -> viewModel.setFilter(null)
@@ -67,10 +71,19 @@ class ListFragment : Fragment() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+   /* override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.main_menu, menu)
-    }
+        val cartItem = menu.findItem(R.id.action_cart)
+        val actionView = cartItem.actionView
+        cartBadge = actionView?.findViewById(R.id.cart_badge)
 
+        actionView?.setOnClickListener {
+            onOptionsItemSelected(cartItem)
+        }
+
+        updateCartBadge(viewModel.cartItems.value?.sumOf { it.quantity } ?: 0)
+    }
+*/
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_about -> {
@@ -82,6 +95,15 @@ class ListFragment : Fragment() {
                 true
             }
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun updateCartBadge(count: Int) {
+        if (count > 0) {
+            cartBadge?.visibility = View.VISIBLE
+            cartBadge?.text = count.toString()
+        } else {
+            cartBadge?.visibility = View.GONE
         }
     }
 

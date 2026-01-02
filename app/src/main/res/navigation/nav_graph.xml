@@ -9,6 +9,7 @@
         android:id="@+id/listFragment"
         android:name="com.example.marketplaceapp.viewmodel.ListFragment"
         tools:layout="@layout/fragment_list">
+
         <action
             android:id="@+id/action_listFragment_to_addEditFragment"
             app:destination="@id/addEditFragment" />
@@ -58,5 +59,8 @@
         android:name="com.example.marketplaceapp.viewmodel.CartFragment"
         android:label="Shopping Cart"
         tools:layout="@layout/fragment_cart" />
+
+
+
 
 </navigation>

@@ -6,6 +6,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.marketplaceapp.data.CartItem
+import com.example.marketplaceapp.data.CartManager
 import com.example.marketplaceapp.data.MarketItem
 import com.example.marketplaceapp.data.MarketRepository
 
@@ -14,10 +16,13 @@ class MarketViewModel(application: Application) : AndroidViewModel(application) 
     private val repository = MarketRepository()
     private val _allItems = repository.getAllItems()
     private val _currentLocation = MutableLiveData<Location>()
-    private val _cartItems = MutableLiveData<MutableList<MarketItem>>(mutableListOf())
+    val currentLocation: LiveData<Location> get() = _currentLocation // Added this back
 
-    val currentLocation: LiveData<Location> get() = _currentLocation
-    val cartItems: LiveData<MutableList<MarketItem>> get() = _cartItems
+        // private val _cartItems = MutableLiveData<List<CartItem>>(emptyList())
+        val cartItems: LiveData<MutableList<CartItem>> get() = CartManager.cartItems
+
+
+    //val cartItems: LiveData<List<CartItem>> get() = _cartItems
 
     val finalItemList = MediatorLiveData<List<MarketItem>>()
 
@@ -80,19 +85,30 @@ class MarketViewModel(application: Application) : AndroidViewModel(application) 
         repository.deleteItem(item)
     }
 
-    fun addToCart(item: MarketItem) {
-        val list = _cartItems.value ?: mutableListOf()
-        list.add(item)
-        _cartItems.value = list
+    fun addToCart(marketItem: MarketItem) {
+        CartManager.addToCart(marketItem)
+//        val currentList = _cartItems.value ?: emptyList()
+//        val newList = currentList.toMutableList()
+//        val existingItem = newList.find { it.item.id == marketItem.id }
+//
+//        if (existingItem != null) {
+//            existingItem.quantity++
+//        } else {
+//            newList.add(CartItem(item = marketItem, quantity = 1))
+//        }
+//        _cartItems.value = newList
     }
 
-    fun removeFromCart(item: MarketItem) {
-        val list = _cartItems.value ?: mutableListOf()
-        list.remove(item)
-        _cartItems.value = list
+    fun removeFromCart(cartItem: CartItem) {
+//        val currentList = _cartItems.value ?: emptyList()
+//        val newList = currentList.toMutableList()
+//        newList.remove(cartItem)
+//        _cartItems.value = newList
+        CartManager.removeFromCart(cartItem)
     }
 
     fun clearCart() {
-        _cartItems.value = mutableListOf()
+//        _cartItems.value = emptyList()
+        CartManager.clearCart()
     }
 }

@@ -14,6 +14,12 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.example.marketplaceapp.viewmodel.MarketViewModel
 import com.google.android.gms.location.LocationServices
+import android.view.Menu
+import android.view.View
+import android.widget.TextView
+import com.example.marketplaceapp.data.CartManager
+
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -37,13 +43,30 @@ class MainActivity : AppCompatActivity() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
+        supportActionBar?.title = "Marketplace" // Set the main title
+
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
 
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            supportActionBar?.subtitle = destination.label // Update the subtitle
+        }
+
         setupActionBarWithNavController(navController)
 
         checkLocationPermission()
+
+
+        setupActionBarWithNavController(navController)
+
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+
+            supportActionBar?.title = "Marketplace"
+
+
+            supportActionBar?.subtitle = destination.label
+        }
     }
 
     private fun checkLocationPermission() {
@@ -76,5 +99,30 @@ class MainActivity : AppCompatActivity() {
 
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp() || super.onSupportNavigateUp()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.main_menu, menu) // טעינת התפריט
+
+        val cartItem = menu.findItem(R.id.action_cart)
+        val actionView = cartItem.actionView // זה ה-FrameLayout מהקובץ menu_item_cart.xml
+        val badgeTextView = actionView?.findViewById<TextView>(R.id.cart_badge)
+
+        // האזנה לשינויים בכמות הפריטים מה-CartManager
+        CartManager.totalItemsCount.observe(this) { count ->
+            if (count > 0) {
+                badgeTextView?.text = count.toString()
+                badgeTextView?.visibility = View.VISIBLE
+            } else {
+                badgeTextView?.visibility = View.GONE
+            }
+        }
+
+        // הוספת לחיצה על האייקון (כי ActionLayout מבטל את הלחיצה הרגילה)
+        actionView?.setOnClickListener {
+            navController.navigate(R.id.cartFragment) // נווט לעגלה
+        }
+
+        return true
     }
 }

@@ -2,8 +2,10 @@ package com.example.marketplaceapp.data
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.map
 
 object CartManager {
+
 
     private val _cartItems = MutableLiveData<MutableList<CartItem>>(mutableListOf())
     val cartItems: LiveData<MutableList<CartItem>> = _cartItems
@@ -20,6 +22,10 @@ object CartManager {
         _cartItems.value = currentItems
     }
 
+    val totalItemsCount: LiveData<Int> = _cartItems.map { list ->
+        list.sumOf { it.quantity }
+    }
+
     fun removeFromCart(cartItem: CartItem) {
         val currentItems = _cartItems.value ?: mutableListOf()
         currentItems.remove(cartItem)
@@ -28,5 +34,9 @@ object CartManager {
 
     fun getTotalPrice(): Double {
         return _cartItems.value?.sumOf { it.item.price * it.quantity } ?: 0.0
+    }
+
+    fun clearCart() {
+        _cartItems.value = mutableListOf()
     }
 }

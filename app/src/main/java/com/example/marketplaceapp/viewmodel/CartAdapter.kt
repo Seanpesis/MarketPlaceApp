@@ -5,12 +5,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.marketplaceapp.data.MarketItem
+import com.example.marketplaceapp.data.CartItem
 import com.example.marketplaceapp.databinding.ItemCartBinding
 
 class CartAdapter(
-    private val onDeleteClick: (MarketItem) -> Unit
-) : ListAdapter<MarketItem, CartAdapter.CartViewHolder>(DiffCallback()) {
+    private val onDeleteClick: (CartItem) -> Unit
+) : ListAdapter<CartItem, CartAdapter.CartViewHolder>(DiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CartViewHolder {
         val binding = ItemCartBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -19,21 +19,28 @@ class CartAdapter(
 
     override fun onBindViewHolder(holder: CartViewHolder, position: Int) {
         val currentItem = getItem(position)
-        holder.bind(currentItem, onDeleteClick)
+        holder.bind(currentItem)
     }
 
-    class CartViewHolder(private val binding: ItemCartBinding) :
+    inner class CartViewHolder(private val binding: ItemCartBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: MarketItem, onDeleteClick: (MarketItem) -> Unit) {
-            binding.tvCartItemTitle.text = item.title
-            binding.tvCartItemPrice.text = "${item.price} $"
-            binding.btnDeleteFromCart.setOnClickListener { onDeleteClick(item) }
+        init {
+            binding.btnDeleteFromCart.setOnClickListener { 
+                if (adapterPosition != RecyclerView.NO_POSITION) {
+                    onDeleteClick(getItem(adapterPosition))
+                }
+            }
+        }
+
+        fun bind(cartItem: CartItem) {
+            binding.tvCartItemTitle.text = cartItem.item.title
+            binding.tvCartItemPrice.text = "${cartItem.item.price} $"
         }
     }
 
-    class DiffCallback : DiffUtil.ItemCallback<MarketItem>() {
-        override fun areItemsTheSame(oldItem: MarketItem, newItem: MarketItem) = oldItem.id == newItem.id
-        override fun areContentsTheSame(oldItem: MarketItem, newItem: MarketItem) = oldItem == newItem
+    class DiffCallback : DiffUtil.ItemCallback<CartItem>() {
+        override fun areItemsTheSame(oldItem: CartItem, newItem: CartItem) = oldItem.item.id == newItem.item.id
+        override fun areContentsTheSame(oldItem: CartItem, newItem: CartItem) = oldItem == newItem
     }
 }
