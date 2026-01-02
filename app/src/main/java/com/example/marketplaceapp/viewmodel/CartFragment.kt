@@ -8,6 +8,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.marketplaceapp.R
+import com.example.marketplaceapp.data.CartItem
+import com.example.marketplaceapp.data.CartManager
 import com.example.marketplaceapp.databinding.FragmentCartBinding
 
 class CartFragment : Fragment() {
@@ -35,8 +38,8 @@ class CartFragment : Fragment() {
 
         viewModel.cartItems.observe(viewLifecycleOwner) { items ->
             cartAdapter.submitList(items.toList())
-            val totalPrice = items.sumOf { it.price }
-            binding.tvTotalPrice.text = "$${String.format("%.2f", totalPrice)}"
+            val totalPrice = items.sumOf { it.item.price * it.quantity }
+            binding.tvTotalPrice.text = getString(R.string.total_price_format, totalPrice)
         }
 
         binding.btnCheckout.setOnClickListener {
@@ -45,29 +48,20 @@ class CartFragment : Fragment() {
     }
 
     private fun showCheckoutDialog() {
-        val paymentMethods = arrayOf("Cash", "Credit Card")
+
+        val totalItems = CartManager.totalItemsCount.value ?: 0
+        val totalPrice = CartManager.getTotalPrice()
+
         AlertDialog.Builder(requireContext())
-            .setTitle("Choose Payment Method")
-            .setItems(paymentMethods) { dialog, which ->
-                val paymentMethod = paymentMethods[which]
-                showConfirmationDialog(paymentMethod)
+            .setTitle(R.string.checkout_summary)
+
+            .setMessage(getString(R.string.checkout_details, totalItems, totalPrice))
+            .setPositiveButton(R.string.ok) { dialog, _ ->
+                CartManager.clearCart()
                 dialog.dismiss()
             }
             .show()
     }
-
-    private fun showConfirmationDialog(paymentMethod: String) {
-        val orderId = (100000..999999).random()
-        AlertDialog.Builder(requireContext())
-            .setTitle("Payment Successful")
-            .setMessage("Your order (ID: #$orderId) has been placed successfully using $paymentMethod.")
-            .setPositiveButton("OK") { dialog, _ ->
-                viewModel.clearCart()
-                dialog.dismiss()
-            }
-            .show()
-    }
-
 
     override fun onDestroyView() {
         super.onDestroyView()
