@@ -1,4 +1,4 @@
-package com.example.marketplaceapp.viewmodel
+package com.example.marketplaceapp.ui.adapter
 
 import android.location.Location
 import android.net.Uri
@@ -43,7 +43,7 @@ class MarketAdapter(
                     onItemClick(getItem(adapterPosition))
                 }
             }
-            binding.btnAddToCart.setOnClickListener { 
+            binding.btnAddToCart.setOnClickListener {
                 if (adapterPosition != RecyclerView.NO_POSITION) {
                     onAddToCartClick(getItem(adapterPosition))
                 }

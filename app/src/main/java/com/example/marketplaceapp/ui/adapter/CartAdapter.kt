@@ -1,4 +1,4 @@
-package com.example.marketplaceapp.viewmodel
+package com.example.marketplaceapp.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -26,7 +26,7 @@ class CartAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         init {
-            binding.btnDeleteFromCart.setOnClickListener { 
+            binding.btnDeleteFromCart.setOnClickListener {
                 if (adapterPosition != RecyclerView.NO_POSITION) {
                     onDeleteClick(getItem(adapterPosition))
                 }

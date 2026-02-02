@@ -87,28 +87,13 @@ class MarketViewModel(application: Application) : AndroidViewModel(application) 
 
     fun addToCart(marketItem: MarketItem) {
         CartManager.addToCart(marketItem)
-//        val currentList = _cartItems.value ?: emptyList()
-//        val newList = currentList.toMutableList()
-//        val existingItem = newList.find { it.item.id == marketItem.id }
-//
-//        if (existingItem != null) {
-//            existingItem.quantity++
-//        } else {
-//            newList.add(CartItem(item = marketItem, quantity = 1))
-//        }
-//        _cartItems.value = newList
     }
 
     fun removeFromCart(cartItem: CartItem) {
-//        val currentList = _cartItems.value ?: emptyList()
-//        val newList = currentList.toMutableList()
-//        newList.remove(cartItem)
-//        _cartItems.value = newList
         CartManager.removeFromCart(cartItem)
     }
 
     fun clearCart() {
-//        _cartItems.value = emptyList()
         CartManager.clearCart()
     }
 }

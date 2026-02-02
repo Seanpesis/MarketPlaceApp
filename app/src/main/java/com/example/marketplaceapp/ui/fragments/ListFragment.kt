@@ -1,7 +1,10 @@
-package com.example.marketplaceapp.viewmodel
+package com.example.marketplaceapp.ui.fragments
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -9,6 +12,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.marketplaceapp.R
 import com.example.marketplaceapp.databinding.FragmentListBinding
+import com.example.marketplaceapp.ui.adapter.MarketAdapter
+import com.example.marketplaceapp.viewmodel.MarketViewModel
 
 class ListFragment : Fragment() {
 
@@ -71,19 +76,6 @@ class ListFragment : Fragment() {
         }
     }
 
-   /* override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.main_menu, menu)
-        val cartItem = menu.findItem(R.id.action_cart)
-        val actionView = cartItem.actionView
-        cartBadge = actionView?.findViewById(R.id.cart_badge)
-
-        actionView?.setOnClickListener {
-            onOptionsItemSelected(cartItem)
-        }
-
-        updateCartBadge(viewModel.cartItems.value?.sumOf { it.quantity } ?: 0)
-    }
-*/
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_about -> {

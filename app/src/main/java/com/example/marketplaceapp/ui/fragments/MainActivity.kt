@@ -1,8 +1,11 @@
-package com.example.marketplaceapp
+package com.example.marketplaceapp.ui.fragments
 
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.view.Menu
+import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -12,14 +15,10 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupActionBarWithNavController
+import com.example.marketplaceapp.R
+import com.example.marketplaceapp.data.CartManager
 import com.example.marketplaceapp.viewmodel.MarketViewModel
 import com.google.android.gms.location.LocationServices
-import android.view.Menu
-import android.view.View
-import android.widget.TextView
-import com.example.marketplaceapp.data.CartManager
-
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -43,14 +42,14 @@ class MainActivity : AppCompatActivity() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        supportActionBar?.title = "Marketplace" // Set the main title
+        supportActionBar?.title = "Marketplace"
 
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            supportActionBar?.subtitle = destination.label // Update the subtitle
+            supportActionBar?.subtitle = destination.label
         }
 
         setupActionBarWithNavController(navController)
@@ -102,13 +101,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.main_menu, menu) // טעינת התפריט
+        menuInflater.inflate(R.menu.main_menu, menu)
 
         val cartItem = menu.findItem(R.id.action_cart)
-        val actionView = cartItem.actionView // זה ה-FrameLayout מהקובץ menu_item_cart.xml
+        val actionView = cartItem.actionView
         val badgeTextView = actionView?.findViewById<TextView>(R.id.cart_badge)
 
-        // האזנה לשינויים בכמות הפריטים מה-CartManager
+
         CartManager.totalItemsCount.observe(this) { count ->
             if (count > 0) {
                 badgeTextView?.text = count.toString()
@@ -118,9 +117,10 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // הוספת לחיצה על האייקון (כי ActionLayout מבטל את הלחיצה הרגילה)
+
         actionView?.setOnClickListener {
-            navController.navigate(R.id.cartFragment) // נווט לעגלה
+            navController.navigate(R.id.cartFragment)
+
         }
 
         return true

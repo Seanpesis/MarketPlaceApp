@@ -1,4 +1,4 @@
-package com.example.marketplaceapp.viewmodel
+package com.example.marketplaceapp.ui.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,9 +9,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marketplaceapp.R
-import com.example.marketplaceapp.data.CartItem
 import com.example.marketplaceapp.data.CartManager
 import com.example.marketplaceapp.databinding.FragmentCartBinding
+import com.example.marketplaceapp.ui.adapter.CartAdapter
+import com.example.marketplaceapp.viewmodel.MarketViewModel
 
 class CartFragment : Fragment() {
 

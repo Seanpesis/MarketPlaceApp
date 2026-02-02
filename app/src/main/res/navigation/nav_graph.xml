@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/listFragment"
-        android:name="com.example.marketplaceapp.viewmodel.ListFragment"
+        android:name="com.example.marketplaceapp.ui.fragments.ListFragment"
         tools:layout="@layout/fragment_list">
 
         <action
@@ -26,7 +26,7 @@
 
     <fragment
         android:id="@+id/addEditFragment"
-        android:name="com.example.marketplaceapp.viewmodel.AddEditFragment"
+        android:name="com.example.marketplaceapp.ui.fragments.AddEditFragment"
         android:label="Add/Edit Item"
         tools:layout="@layout/fragment_add_edit">
         <argument
@@ -37,7 +37,7 @@
 
     <fragment
         android:id="@+id/detailFragment"
-        android:name="com.example.marketplaceapp.viewmodel.DetailFragment"
+        android:name="com.example.marketplaceapp.ui.fragments.DetailFragment"
         android:label="Item Details"
         tools:layout="@layout/fragment_detail">
         <argument
@@ -50,13 +50,13 @@
 
     <fragment
         android:id="@+id/aboutFragment"
-        android:name="com.example.marketplaceapp.AboutFragment"
+        android:name="com.example.marketplaceapp.ui.fragments.AboutFragment"
         android:label="About"
         tools:layout="@layout/fragment_about" />
 
     <fragment
         android:id="@+id/cartFragment"
-        android:name="com.example.marketplaceapp.viewmodel.CartFragment"
+        android:name="com.example.marketplaceapp.ui.fragments.CartFragment"
         android:label="Shopping Cart"
         tools:layout="@layout/fragment_cart" />
 

@@ -1,4 +1,4 @@
-package com.example.marketplaceapp
+package com.example.marketplaceapp.ui.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater

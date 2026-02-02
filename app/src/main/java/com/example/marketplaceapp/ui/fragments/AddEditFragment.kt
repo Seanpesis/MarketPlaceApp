@@ -1,5 +1,7 @@
-package com.example.marketplaceapp.viewmodel
+package com.example.marketplaceapp.ui.fragments
 
+import android.R
+import android.content.Intent
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
@@ -14,9 +16,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
-import com.example.marketplaceapp.R
 import com.example.marketplaceapp.data.MarketItem
 import com.example.marketplaceapp.databinding.FragmentAddEditBinding
+import com.example.marketplaceapp.viewmodel.MarketViewModel
 
 class AddEditFragment : Fragment() {
 
@@ -33,7 +35,7 @@ class AddEditFragment : Fragment() {
         uri?.let {
             selectedImageUri = it
             try {
-                val flags = android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+                val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
                 requireContext().contentResolver.takePersistableUriPermission(it, flags)
             } catch (e: SecurityException) {
                 e.printStackTrace()
@@ -54,8 +56,8 @@ class AddEditFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val categories = arrayOf("Books", "Clothing", "Art", "Technology")
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categories)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        val adapter = ArrayAdapter(requireContext(), R.layout.simple_spinner_item, categories)
+        adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item)
         binding.spinnerCategory.adapter = adapter
 
         val isEditMode = args.itemId != null
@@ -115,7 +117,7 @@ class AddEditFragment : Fragment() {
         val selectedCategory = binding.spinnerCategory.selectedItem.toString()
 
         if (title.isBlank() || desc.isBlank() || priceStr.isBlank() || phone.isBlank()) {
-            Toast.makeText(context, R.string.fill_fields, Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, com.example.marketplaceapp.R.string.fill_fields, Toast.LENGTH_SHORT).show()
             return
         }
 

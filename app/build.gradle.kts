@@ -54,6 +54,9 @@ dependencies {
     implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
     implementation(libs.firebase.crashlytics)
     implementation("com.github.bumptech.glide:glide:4.16.0")
+    testImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
     // Google Play Services for location
     implementation("com.google.android.gms:play-services-location:21.2.0")

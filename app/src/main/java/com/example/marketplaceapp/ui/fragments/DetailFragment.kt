@@ -1,4 +1,4 @@
-package com.example.marketplaceapp.viewmodel
+package com.example.marketplaceapp.ui.fragments
 
 import android.location.Location
 import android.net.Uri
@@ -13,6 +13,7 @@ import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.example.marketplaceapp.R
 import com.example.marketplaceapp.databinding.FragmentDetailBinding
+import com.example.marketplaceapp.viewmodel.MarketViewModel
 
 class DetailFragment : Fragment() {
 
