@@ -65,13 +65,18 @@ class ListFragment : Fragment() {
             findNavController().navigate(action)
         }
 
-        binding.chipGroup.setOnCheckedChangeListener { group, checkedId ->
-            when (checkedId) {
-                R.id.btnFilterAll -> viewModel.setFilter(null)
-                R.id.btnFilterBooks -> viewModel.setFilter("Books")
-                R.id.btnFilterClothing -> viewModel.setFilter("Clothing")
-                R.id.btnFilterArt -> viewModel.setFilter("Art")
-                R.id.btnFilterTechnology -> viewModel.setFilter("Technology")
+        binding.chipGroup.setOnCheckedChangeListener { _, checkedId ->
+            if (checkedId == View.NO_ID) {
+                viewModel.setFilter("All")
+            } else {
+
+                when (checkedId) {
+                    R.id.btnFilterAll -> viewModel.setFilter("All")
+                    R.id.btnFilterBooks -> viewModel.setFilter("Books")
+                    R.id.btnFilterClothing -> viewModel.setFilter("Clothing")
+                    R.id.btnFilterArt -> viewModel.setFilter("Art")
+                    R.id.btnFilterTechnology -> viewModel.setFilter("Technology")
+                }
             }
         }
     }

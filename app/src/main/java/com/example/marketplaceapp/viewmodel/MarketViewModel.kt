@@ -16,13 +16,13 @@ class MarketViewModel(application: Application) : AndroidViewModel(application) 
     private val repository = MarketRepository()
     private val _allItems = repository.getAllItems()
     private val _currentLocation = MutableLiveData<Location>()
-    val currentLocation: LiveData<Location> get() = _currentLocation // Added this back
+    val currentLocation: LiveData<Location> get() = _currentLocation
 
-        // private val _cartItems = MutableLiveData<List<CartItem>>(emptyList())
+
         val cartItems: LiveData<MutableList<CartItem>> get() = CartManager.cartItems
 
 
-    //val cartItems: LiveData<List<CartItem>> get() = _cartItems
+
 
     val finalItemList = MediatorLiveData<List<MarketItem>>()
 
