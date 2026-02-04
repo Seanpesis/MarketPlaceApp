@@ -19,6 +19,9 @@ import com.bumptech.glide.Glide
 import com.example.marketplaceapp.data.MarketItem
 import com.example.marketplaceapp.databinding.FragmentAddEditBinding
 import com.example.marketplaceapp.viewmodel.MarketViewModel
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.ktx.storage
+import com.google.firebase.ktx.Firebase
 
 class AddEditFragment : Fragment() {
 
@@ -116,36 +119,56 @@ class AddEditFragment : Fragment() {
         val phone = binding.etPhone.text.toString().trim()
         val selectedCategory = binding.spinnerCategory.selectedItem.toString()
 
+        // בדיקת תקינות שדות
         if (title.isBlank() || desc.isBlank() || priceStr.isBlank() || phone.isBlank()) {
-            Toast.makeText(context, com.example.marketplaceapp.R.string.fill_fields, Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "נא למלא את כל השדות", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val price = priceStr.toDoubleOrNull()
-        if (price == null) {
-            Toast.makeText(context, "Please enter a valid price", Toast.LENGTH_SHORT).show()
-            return
+        val price = priceStr.toDoubleOrNull() ?: 0.0
+
+        // אם בחרנו תמונה חדשה - צריך להעלות אותה
+        if (selectedImageUri != null && !selectedImageUri.toString().startsWith("http")) {
+
+            //Toast.makeText(context, "מעלה תמונה, רק רגע...", Toast.LENGTH_SHORT).show()
+
+            val storageRef = com.google.firebase.storage.FirebaseStorage.getInstance().reference
+                .child("product_images/${System.currentTimeMillis()}.jpg")
+
+            storageRef.putFile(selectedImageUri!!).addOnSuccessListener {
+                storageRef.downloadUrl.addOnSuccessListener { uri: Uri ->
+
+                    // --- כאן אנחנו בתוך "חדר ההצלחה" ---
+                    val publicImageUrl = uri.toString()
+
+                    // רק עכשיו, כשיש לנו קישור, יוצרים ושומרים!
+                    performSave(isEditMode, title, desc, price, phone, selectedCategory, publicImageUrl)
+                }
+            }.addOnFailureListener {
+                Toast.makeText(context, "העלאת התמונה נכשלה", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            // אם אין תמונה חדשה (או שאנחנו בעריכה ויש כבר קישור), שומרים עם מה שיש
+            val imageUriToSave = selectedImageUri?.toString()
+            performSave(isEditMode, title, desc, price, phone, selectedCategory, imageUriToSave)
         }
+    }
 
-        val imageString = selectedImageUri?.toString()
 
+    private fun performSave(isEditMode: Boolean, title: String, desc: String, price: Double, phone: String, category: String, imageUri: String?) {
         val itemToSave = MarketItem(
             id = if (isEditMode) currentItem!!.id else "",
             title = title,
             description = desc,
             price = price,
             contactPhone = phone,
-            imageUri = imageString,
-            category = selectedCategory,
+            imageUri = imageUri,
+            category = category,
             latitude = itemLocation?.latitude,
             longitude = itemLocation?.longitude
         )
 
-        if (isEditMode) {
-            viewModel.update(itemToSave)
-        } else {
-            viewModel.insert(itemToSave)
-        }
+        if (isEditMode) viewModel.update(itemToSave) else viewModel.insert(itemToSave)
 
         findNavController().popBackStack()
     }

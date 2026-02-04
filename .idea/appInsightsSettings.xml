@@ -10,9 +10,9 @@
               <option name="connection">
                 <ConnectionSetting>
                   <option name="appId" value="com.example.marketplaceapp" />
-                  <option name="mobileSdkAppId" value="1:693700848302:android:9dc9f55f07007ac0299b3f" />
-                  <option name="projectId" value="marketplace-e4c12" />
-                  <option name="projectNumber" value="693700848302" />
+                  <option name="mobileSdkAppId" value="1:435723276587:android:372422c047f8c0f854b56e" />
+                  <option name="projectId" value="marketplacenew-d2e13" />
+                  <option name="projectNumber" value="435723276587" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
