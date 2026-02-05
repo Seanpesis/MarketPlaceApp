@@ -1,10 +1,10 @@
 package com.example.marketplaceapp.ui.fragments
 
-import android.R
 import android.content.Intent
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,13 +16,14 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
+import com.example.marketplaceapp.R
 import com.example.marketplaceapp.data.MarketItem
 import com.example.marketplaceapp.databinding.FragmentAddEditBinding
 import com.example.marketplaceapp.viewmodel.MarketViewModel
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.ktx.storage
-import com.google.firebase.ktx.Firebase
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class AddEditFragment : Fragment() {
 
     private var _binding: FragmentAddEditBinding? = null
@@ -35,15 +36,15 @@ class AddEditFragment : Fragment() {
     private var currentItem: MarketItem? = null
 
     private val pickImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        uri?.let {
-            selectedImageUri = it
+        uri?.let { imageUri ->
+            selectedImageUri = imageUri
             try {
                 val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                requireContext().contentResolver.takePersistableUriPermission(it, flags)
+                requireContext().contentResolver.takePersistableUriPermission(imageUri, flags)
             } catch (e: SecurityException) {
-                e.printStackTrace()
+                Log.e("AddEditFragment", "Failed to take persistable permission for URI", e)
             }
-            Glide.with(this).load(it).into(binding.ivPreview)
+            Glide.with(this).load(imageUri).into(binding.ivPreview)
         }
     }
 
@@ -58,38 +59,45 @@ class AddEditFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val categories = arrayOf("Books", "Clothing", "Art", "Technology")
-        val adapter = ArrayAdapter(requireContext(), R.layout.simple_spinner_item, categories)
-        adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item)
+        val categories = arrayOf(
+            getString(R.string.category_books),
+            getString(R.string.category_clothing),
+            getString(R.string.category_art),
+            getString(R.string.category_technology)
+        )
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categories)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerCategory.adapter = adapter
 
         val isEditMode = args.itemId != null
 
         if (isEditMode) {
-            viewModel.getItem(args.itemId!!).observe(viewLifecycleOwner) { item ->
-                item?.let {
-                    currentItem = it
-                    binding.etTitle.setText(it.title)
-                    binding.etDescription.setText(it.description)
-                    binding.etPrice.setText(it.price.toString())
-                    binding.etPhone.setText(it.contactPhone)
+            args.itemId?.let { itemId ->
+                viewModel.getItem(itemId).observe(viewLifecycleOwner) { item ->
+                    item?.let { currentItemData ->
+                        currentItem = currentItemData
+                        binding.etTitle.setText(currentItemData.title)
+                        binding.etDescription.setText(currentItemData.description)
+                        binding.etPrice.setText(currentItemData.price.toString())
+                        binding.etPhone.setText(currentItemData.contactPhone)
 
-                    if (it.imageUri != null) {
-                        selectedImageUri = Uri.parse(it.imageUri)
-                        Glide.with(this).load(selectedImageUri).into(binding.ivPreview)
-                    }
-
-                    if (it.latitude != null && it.longitude != null) {
-                        binding.tvLocationStatus.text = "Location Added"
-                        itemLocation = Location("").apply {
-                            latitude = it.latitude!!
-                            longitude = it.longitude!!
+                        if (currentItemData.imageUri != null) {
+                            selectedImageUri = Uri.parse(currentItemData.imageUri)
+                            Glide.with(this).load(selectedImageUri).into(binding.ivPreview)
                         }
-                    }
 
-                    val categoryIndex = categories.indexOf(it.category)
-                    if (categoryIndex >= 0) {
-                        binding.spinnerCategory.setSelection(categoryIndex)
+                        if (currentItemData.latitude != null && currentItemData.longitude != null) {
+                            binding.tvLocationStatus.text = getString(R.string.location_added_already)
+                            itemLocation = Location("").apply {
+                                latitude = currentItemData.latitude
+                                longitude = currentItemData.longitude
+                            }
+                        }
+
+                        val categoryIndex = categories.indexOf(currentItemData.category)
+                        if (categoryIndex >= 0) {
+                            binding.spinnerCategory.setSelection(categoryIndex)
+                        }
                     }
                 }
             }
@@ -100,11 +108,11 @@ class AddEditFragment : Fragment() {
         }
 
         binding.btnAddLocation.setOnClickListener {
-            viewModel.currentLocation.value?.let {
-                itemLocation = it
-                binding.tvLocationStatus.text = "Location Added!"
-                Toast.makeText(context, "Current location attached", Toast.LENGTH_SHORT).show()
-            } ?: Toast.makeText(context, "Location not available", Toast.LENGTH_SHORT).show()
+            viewModel.currentLocation.value?.let { location ->
+                itemLocation = location
+                binding.tvLocationStatus.text = getString(R.string.location_added)
+                Toast.makeText(context, getString(R.string.current_location_attached), Toast.LENGTH_SHORT).show()
+            } ?: Toast.makeText(context, getString(R.string.location_not_available), Toast.LENGTH_SHORT).show()
         }
 
         binding.btnSave.setOnClickListener {
@@ -119,36 +127,29 @@ class AddEditFragment : Fragment() {
         val phone = binding.etPhone.text.toString().trim()
         val selectedCategory = binding.spinnerCategory.selectedItem.toString()
 
-        // בדיקת תקינות שדות
         if (title.isBlank() || desc.isBlank() || priceStr.isBlank() || phone.isBlank()) {
-            Toast.makeText(context, "נא למלא את כל השדות", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, getString(R.string.please_fill_all_fields), Toast.LENGTH_SHORT).show()
             return
         }
 
         val price = priceStr.toDoubleOrNull() ?: 0.0
 
-        // אם בחרנו תמונה חדשה - צריך להעלות אותה
-        if (selectedImageUri != null && !selectedImageUri.toString().startsWith("http")) {
+        if (selectedImageUri != null && selectedImageUri.toString().startsWith("http").not()) {
+            val imagePath = getString(R.string.product_images, System.currentTimeMillis())
+            val storageRef = FirebaseStorage.getInstance().reference.child(imagePath)
 
-            //Toast.makeText(context, "מעלה תמונה, רק רגע...", Toast.LENGTH_SHORT).show()
-
-            val storageRef = com.google.firebase.storage.FirebaseStorage.getInstance().reference
-                .child("product_images/${System.currentTimeMillis()}.jpg")
-
-            storageRef.putFile(selectedImageUri!!).addOnSuccessListener {
-                storageRef.downloadUrl.addOnSuccessListener { uri: Uri ->
-
-                    // --- כאן אנחנו בתוך "חדר ההצלחה" ---
-                    val publicImageUrl = uri.toString()
-
-                    // רק עכשיו, כשיש לנו קישור, יוצרים ושומרים!
-                    performSave(isEditMode, title, desc, price, phone, selectedCategory, publicImageUrl)
+            selectedImageUri?.let { imageToUpload ->
+                storageRef.putFile(imageToUpload).addOnSuccessListener { _ ->
+                    storageRef.downloadUrl.addOnSuccessListener { downloadedUri: Uri ->
+                        val publicImageUrl = downloadedUri.toString()
+                        performSave(isEditMode, title, desc, price, phone, selectedCategory, publicImageUrl)
+                    }
+                }.addOnFailureListener { exception ->
+                    Log.e("AddEditFragment", "Image upload failed", exception)
+                    Toast.makeText(context, getString(R.string.image_upload_failed), Toast.LENGTH_SHORT).show()
                 }
-            }.addOnFailureListener {
-                Toast.makeText(context, "העלאת התמונה נכשלה", Toast.LENGTH_SHORT).show()
             }
         } else {
-            // אם אין תמונה חדשה (או שאנחנו בעריכה ויש כבר קישור), שומרים עם מה שיש
             val imageUriToSave = selectedImageUri?.toString()
             performSave(isEditMode, title, desc, price, phone, selectedCategory, imageUriToSave)
         }
@@ -168,7 +169,11 @@ class AddEditFragment : Fragment() {
             longitude = itemLocation?.longitude
         )
 
-        if (isEditMode) viewModel.update(itemToSave) else viewModel.insert(itemToSave)
+        if (isEditMode) {
+            viewModel.update(itemToSave)
+        } else {
+            viewModel.insert(itemToSave)
+        }
 
         findNavController().popBackStack()
     }

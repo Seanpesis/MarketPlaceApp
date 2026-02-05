@@ -14,7 +14,9 @@ import com.bumptech.glide.Glide
 import com.example.marketplaceapp.R
 import com.example.marketplaceapp.databinding.FragmentDetailBinding
 import com.example.marketplaceapp.viewmodel.MarketViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class DetailFragment : Fragment() {
 
     private var _binding: FragmentDetailBinding? = null

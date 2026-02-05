@@ -3,6 +3,7 @@ package com.example.marketplaceapp.ui.fragments
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.View
 import android.widget.TextView
@@ -19,7 +20,9 @@ import com.example.marketplaceapp.R
 import com.example.marketplaceapp.data.CartManager
 import com.example.marketplaceapp.viewmodel.MarketViewModel
 import com.google.android.gms.location.LocationServices
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var navController: NavController
@@ -39,33 +42,23 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        CartManager.fetchCartItems()
+
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
-
-        supportActionBar?.title = "Marketplace"
 
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
 
+        setupActionBarWithNavController(navController)
+
         navController.addOnDestinationChangedListener { _, destination, _ ->
+            supportActionBar?.title = "Marketplace"
             supportActionBar?.subtitle = destination.label
         }
-
-        setupActionBarWithNavController(navController)
 
         checkLocationPermission()
-
-
-        setupActionBarWithNavController(navController)
-
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-
-            supportActionBar?.title = "Marketplace"
-
-
-            supportActionBar?.subtitle = destination.label
-        }
     }
 
     private fun checkLocationPermission() {
@@ -92,6 +85,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
         } catch (e: SecurityException) {
+            Log.e("MainActivity", "Failed to get location due to security issue.", e)
             Toast.makeText(this, "Failed to get location due to security issue.", Toast.LENGTH_SHORT).show()
         }
     }

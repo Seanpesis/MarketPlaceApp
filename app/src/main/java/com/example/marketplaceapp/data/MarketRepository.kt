@@ -1,67 +1,55 @@
 package com.example.marketplaceapp.data
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.toObjects
+import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class MarketRepository {
+@Singleton
+class MarketRepository @Inject constructor(
+    firestore: FirebaseFirestore
+) {
 
-    private val firestore = FirebaseFirestore.getInstance()
     private val itemsCollection = firestore.collection("items")
 
-    fun getAllItems(): LiveData<List<MarketItem>> {
-        val liveData = MutableLiveData<List<MarketItem>>()
-        itemsCollection.addSnapshotListener { snapshot, error ->
-            if (error != null) {
-                Log.w("MarketRepository", "Listen failed.", error)
-                return@addSnapshotListener
-            }
-
-            if (snapshot != null) {
-                val items = snapshot.toObjects<MarketItem>()
-                liveData.value = items
-            } else {
-                liveData.value = emptyList()
-            }
+    suspend fun getAllItems(): List<MarketItem> {
+        return try {
+            val snapshot = itemsCollection.get().await()
+            snapshot.toObjects(MarketItem::class.java)
+        } catch (e: Exception) {
+            Log.w("MarketRepository", "Error getting items.", e)
+            emptyList()
         }
-        return liveData
     }
 
-    fun insertItem(item: MarketItem) {
-        itemsCollection.add(item)
-            .addOnSuccessListener { Log.d("MarketRepository", "Item added successfully") }
-            .addOnFailureListener { e -> Log.w("MarketRepository", "Error adding item", e) }
+    suspend fun insertItem(item: MarketItem) {
+        try {
+            itemsCollection.add(item).await()
+            Log.d("MarketRepository", "Item added successfully")
+        } catch (e: Exception) {
+            Log.w("MarketRepository", "Error adding item", e)
+        }
     }
 
-    fun updateItem(item: MarketItem) {
+    suspend fun updateItem(item: MarketItem) {
         if (item.id.isNotEmpty()) {
-            itemsCollection.document(item.id).set(item)
-                .addOnSuccessListener { Log.d("MarketRepository", "Item updated successfully") }
-                .addOnFailureListener { e -> Log.w("MarketRepository", "Error updating item", e) }
+            try {
+                itemsCollection.document(item.id).set(item).await()
+                Log.d("MarketRepository", "Item updated successfully")
+            } catch (e: Exception) {
+                Log.w("MarketRepository", "Error updating item", e)
+            }
         }
     }
 
-    fun deleteItem(item: MarketItem) {
-        if (item.id.isNotEmpty()) {
-            itemsCollection.document(item.id).delete()
-                .addOnSuccessListener { Log.d("MarketRepository", "Item deleted successfully") }
-                .addOnFailureListener { e -> Log.w("MarketRepository", "Error deleting item", e) }
+    suspend fun getItem(itemId: String): MarketItem? {
+        return try {
+            val snapshot = itemsCollection.document(itemId).get().await()
+            snapshot.toObject(MarketItem::class.java)
+        } catch (e: Exception) {
+            Log.w("MarketRepository", "Error getting single item.", e)
+            null
         }
-    }
-    
-    fun getItem(itemId: String): LiveData<MarketItem> {
-        val itemLiveData = MutableLiveData<MarketItem>()
-        itemsCollection.document(itemId).addSnapshotListener { snapshot, error ->
-            if (error != null) {
-                Log.w("MarketRepository", "Listen failed for single item.", error)
-                return@addSnapshotListener
-            }
-            if (snapshot != null && snapshot.exists()) {
-                itemLiveData.value = snapshot.toObject(MarketItem::class.java)
-            }
-        }
-        return itemLiveData
     }
 }

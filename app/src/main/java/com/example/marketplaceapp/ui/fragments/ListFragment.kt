@@ -2,19 +2,25 @@ package com.example.marketplaceapp.ui.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.marketplaceapp.R
 import com.example.marketplaceapp.databinding.FragmentListBinding
 import com.example.marketplaceapp.ui.adapter.MarketAdapter
 import com.example.marketplaceapp.viewmodel.MarketViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ListFragment : Fragment() {
 
     private var _binding: FragmentListBinding? = null
@@ -27,12 +33,13 @@ class ListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentListBinding.inflate(inflater, container, false)
-        setHasOptionsMenu(true)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        setupMenu()
 
         val adapter = MarketAdapter(
             onItemClick = { item ->
@@ -65,34 +72,47 @@ class ListFragment : Fragment() {
             findNavController().navigate(action)
         }
 
+        @Suppress("DEPRECATION")
         binding.chipGroup.setOnCheckedChangeListener { _, checkedId ->
-            if (checkedId == View.NO_ID) {
-                viewModel.setFilter("All")
-            } else {
-
-                when (checkedId) {
-                    R.id.btnFilterAll -> viewModel.setFilter("All")
-                    R.id.btnFilterBooks -> viewModel.setFilter("Books")
-                    R.id.btnFilterClothing -> viewModel.setFilter("Clothing")
-                    R.id.btnFilterArt -> viewModel.setFilter("Art")
-                    R.id.btnFilterTechnology -> viewModel.setFilter("Technology")
-                }
+            val category = when (checkedId) {
+                R.id.btnFilterBooks -> "Books"
+                R.id.btnFilterClothing -> "Clothing"
+                R.id.btnFilterArt -> "Art"
+                R.id.btnFilterTechnology -> "Technology"
+                else -> "All"
             }
+            viewModel.setFilter(category)
         }
+        binding.chipGroup.check(R.id.btnFilterAll)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_about -> {
-                findNavController().navigate(ListFragmentDirections.actionListFragmentToAboutFragment())
-                true
+    private fun setupMenu() {
+        requireActivity().addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.main_menu, menu)
+                val cartItem = menu.findItem(R.id.action_cart)
+                val actionView = cartItem.actionView
+                cartBadge = actionView?.findViewById(R.id.cart_badge)
+                actionView?.setOnClickListener {
+                    onMenuItemSelected(cartItem)
+                }
+                updateCartBadge(viewModel.cartItems.value?.sumOf { it.quantity } ?: 0)
             }
-            R.id.action_cart -> {
-                findNavController().navigate(ListFragmentDirections.actionListFragmentToCartFragment())
-                true
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    R.id.action_about -> {
+                        findNavController().navigate(ListFragmentDirections.actionListFragmentToAboutFragment())
+                        true
+                    }
+                    R.id.action_cart -> {
+                        findNavController().navigate(ListFragmentDirections.actionListFragmentToCartFragment())
+                        true
+                    }
+                    else -> false
+                }
             }
-            else -> super.onOptionsItemSelected(item)
-        }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     private fun updateCartBadge(count: Int) {

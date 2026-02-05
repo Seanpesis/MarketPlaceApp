@@ -8,7 +8,6 @@
     <string name="edit">Edit</string>
     <string name="select_image">Select Image</string>
     <string name="contact_info">Contact Info</string>
-    <string name="fill_fields">Please fill all fields</string>
 
     <!-- Dialogs and Menus -->
     <string name="delete_dialog_title">Delete Item</string>
@@ -33,4 +32,20 @@
     <string name="checkout_details">Total Items: %1$d\nTotal Price: %2$.2f $</string>
     <string name="ok">OK</string>
     <string name="total_price_format">Total: $%.2f</string>
+
+    <!-- Add/Edit Fragment -->
+    <string name="location_added">Location Added!</string>
+    <string name="current_location_attached">Current location attached</string>
+    <string name="location_not_available">Location not available</string>
+    <string name="image_upload_failed">העלאת התמונה נכשלה</string>
+    <string name="please_fill_all_fields">נא למלא את כל השדות</string>
+    <string name="location_added_already">Location Added</string>
+    <string name="product_images">product_images/%1$d.jpg</string>
+
+    <!-- Categories -->
+    <string name="category_books">Books</string>
+    <string name="category_clothing">Clothing</string>
+    <string name="category_art">Art</string>
+    <string name="category_technology">Technology</string>
+    <string name="category_general">General</string>
 </resources>

@@ -6,85 +6,102 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.example.marketplaceapp.data.CartItem
 import com.example.marketplaceapp.data.CartManager
 import com.example.marketplaceapp.data.MarketItem
 import com.example.marketplaceapp.data.MarketRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MarketViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class MarketViewModel @Inject constructor(
+    private val repository: MarketRepository,
+    application: Application
+) : AndroidViewModel(application) {
 
-    private val repository = MarketRepository()
-    private val _allItems = repository.getAllItems()
+    private val _allItems = MutableLiveData<List<MarketItem>>()
     private val _currentLocation = MutableLiveData<Location>()
+    private val _filterCategory = MutableLiveData("All")
+
     val currentLocation: LiveData<Location> get() = _currentLocation
-
-
-        val cartItems: LiveData<MutableList<CartItem>> get() = CartManager.cartItems
-
-
-
+    val cartItems: LiveData<List<CartItem>> = CartManager.cartItems
 
     val finalItemList = MediatorLiveData<List<MarketItem>>()
 
     init {
-        finalItemList.addSource(_allItems) { items -> combineAndSort(items, _currentLocation.value, null) }
-        finalItemList.addSource(_currentLocation) { location -> combineAndSort(_allItems.value, location, null) }
+        loadAllItems()
+        finalItemList.addSource(_allItems) { items -> combineFilterAndSort(items, _currentLocation.value, _filterCategory.value) }
+        finalItemList.addSource(_currentLocation) { location -> combineFilterAndSort(_allItems.value, location, _filterCategory.value) }
+        finalItemList.addSource(_filterCategory) { category -> combineFilterAndSort(_allItems.value, _currentLocation.value, category) }
     }
 
-    private fun combineAndSort(items: List<MarketItem>?, location: Location?, category: String?) {
-        if (items == null) {
-            finalItemList.value = emptyList()
-            return
+    private fun loadAllItems() {
+        viewModelScope.launch {
+            _allItems.value = repository.getAllItems()
         }
+    }
 
-        val filteredItems = if (category == null || category == "All") {
-            items
-        } else {
-            items.filter { it.category.equals(category, ignoreCase = true) }
-        }
+    private fun combineFilterAndSort(items: List<MarketItem>?, location: Location?, category: String?) {
+        viewModelScope.launch {
+            val currentItems = items ?: _allItems.value ?: return@launch
 
-        val sortedItems = if (location == null) {
-            filteredItems
-        } else {
-            filteredItems.sortedBy { item ->
-                if (item.latitude != null && item.longitude != null) {
-                    val itemLocation = Location("").apply {
-                        latitude = item.latitude!!
-                        longitude = item.longitude!!
+            val filteredItems = if (category == null || category == "All") {
+                currentItems
+            } else {
+                currentItems.filter { it.category.equals(category, ignoreCase = true) }
+            }
+
+            val sortedItems = if (location == null) {
+                filteredItems
+            } else {
+                filteredItems.sortedBy { item ->
+                    item.latitude?.let { lat ->
+                        item.longitude?.let { lon ->
+                            val itemLocation = Location("").apply {
+                                latitude = lat
+                                longitude = lon
+                            }
+                            return@sortedBy location.distanceTo(itemLocation)
+                        }
                     }
-                    location.distanceTo(itemLocation)
-                } else {
                     Float.MAX_VALUE
                 }
             }
+            finalItemList.value = sortedItems
         }
-        finalItemList.value = sortedItems
     }
 
     fun setFilter(category: String?) {
-        combineAndSort(_allItems.value, _currentLocation.value, category)
+        _filterCategory.value = category
     }
 
     fun setCurrentLocation(location: Location) {
         _currentLocation.value = location
     }
 
-    fun getItem(id: String): LiveData<MarketItem> {
-        return repository.getItem(id)
+    fun getItem(itemId: String): LiveData<MarketItem?> {
+        val itemLiveData = MutableLiveData<MarketItem?>()
+        viewModelScope.launch {
+            itemLiveData.postValue(repository.getItem(itemId))
+        }
+        return itemLiveData
     }
 
     fun insert(item: MarketItem) {
-        repository.insertItem(item)
+        viewModelScope.launch {
+            repository.insertItem(item)
+            loadAllItems()
+        }
     }
 
     fun update(item: MarketItem) {
-        repository.updateItem(item)
+        viewModelScope.launch {
+            repository.updateItem(item)
+            loadAllItems()
+        }
     }
-
-    fun delete(item: MarketItem) {
-        repository.deleteItem(item)
-    }
-
     fun addToCart(marketItem: MarketItem) {
         CartManager.addToCart(marketItem)
     }

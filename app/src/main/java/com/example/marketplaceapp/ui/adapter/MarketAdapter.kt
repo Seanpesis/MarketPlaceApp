@@ -55,11 +55,10 @@ class MarketAdapter(
             binding.tvTitle.text = item.title
             binding.tvPrice.text = context.getString(R.string.price_format, item.price.toString())
 
-            // Display distance
             if (userLocation != null && item.latitude != null && item.longitude != null) {
                 val itemLocation = Location("").apply {
-                    latitude = item.latitude!!
-                    longitude = item.longitude!!
+                    latitude = item.latitude
+                    longitude = item.longitude
                 }
                 val distanceInMeters = userLocation!!.distanceTo(itemLocation)
                 val distanceInKm = distanceInMeters / 1000
@@ -69,7 +68,6 @@ class MarketAdapter(
                 binding.tvDistance.visibility = View.GONE
             }
 
-            // Load image
             val imageUri = item.imageUri
             if (imageUri != null) {
                 Glide.with(context)
