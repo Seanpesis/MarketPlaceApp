@@ -61,7 +61,7 @@ class MarketViewModel @Inject constructor(
                             return@sortedBy location.distanceTo(itemLocation)
                         }
                     }
-                    Float.MAX_VALUE // Put items without location at the end
+                    Float.MAX_VALUE
                 }
             }
             withContext(Dispatchers.Main) {
@@ -98,7 +98,6 @@ class MarketViewModel @Inject constructor(
         return repository.deleteItem(itemId)
     }
 
-    // --- Cart Functions ---
     fun addToCart(marketItem: MarketItem) {
         CartManager.addToCart(marketItem)
     }

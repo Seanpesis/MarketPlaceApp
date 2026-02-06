@@ -1,10 +1,10 @@
 package com.example.marketplaceapp.ui.adapter
 
+import android.annotation.SuppressLint
 import android.location.Location
-import android.net.Uri
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -21,9 +21,12 @@ class MarketAdapter(
 
     fun updateUserLocation(location: Location) {
         userLocation = location
-        notifyDataSetChanged()
+        if (itemCount > 0) {
+            notifyItemRangeChanged(0, itemCount)
+        }
     }
 
+    @SuppressLint("InflateParams")
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MarketViewHolder {
         val binding = ItemMarketBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return MarketViewHolder(binding)
@@ -55,23 +58,10 @@ class MarketAdapter(
             binding.tvTitle.text = item.title
             binding.tvPrice.text = context.getString(R.string.price_format, item.price.toString())
 
-            if (userLocation != null && item.latitude != null && item.longitude != null) {
-                val itemLocation = Location("").apply {
-                    latitude = item.latitude
-                    longitude = item.longitude
-                }
-                val distanceInMeters = userLocation!!.distanceTo(itemLocation)
-                val distanceInKm = distanceInMeters / 1000
-                binding.tvDistance.text = String.format("%.1f km away", distanceInKm)
-                binding.tvDistance.visibility = View.VISIBLE
-            } else {
-                binding.tvDistance.visibility = View.GONE
-            }
-
             val imageUri = item.imageUri
             if (imageUri != null) {
                 Glide.with(context)
-                    .load(Uri.parse(imageUri))
+                    .load(imageUri.toUri())
                     .placeholder(R.drawable.market_icon)
                     .error(R.drawable.market_icon)
                     .into(binding.ivItemImage)

@@ -1,34 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="16dp"
-    android:gravity="center_vertical">
+    android:gravity="center_vertical"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp">
 
-    <TextView
-        android:id="@+id/tvCartItemTitle"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/item_card"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
-        tools:text="Item Title" />
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="8dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="1dp"
+        app:strokeWidth="1dp"
+        app:strokeColor="#E0E0E0">
 
-    <TextView
-        android:id="@+id/tvCartItemPrice"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-        android:textStyle="bold"
-        tools:text="$99.99" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="16dp"
+            android:weightSum="4.5">
+
+            <TextView
+                android:id="@+id/tvCartItemTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2.5"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:gravity="start"
+                android:textAppearance="?attr/textAppearanceBodyLarge"
+                android:textColor="@color/primary_text"
+                tools:text="Product Name Here" />
+
+            <TextView
+                android:id="@+id/tvCartItemQuantity"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textAppearance="?attr/textAppearanceBodyLarge"
+                tools:text="1" />
+
+            <TextView
+                android:id="@+id/tvCartItemPrice"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textAppearance="?attr/textAppearanceBodyLarge"
+                android:textColor="@color/brand_primary"
+                android:textStyle="bold"
+                tools:text="$99.99" />
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 
     <ImageButton
         android:id="@+id/btnDeleteFromCart"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:padding="8dp"
+        android:contentDescription="Remove from cart"
+        android:layout_marginStart="8dp"
+        app:tint="?attr/colorError"
         android:src="@android:drawable/ic_menu_delete" />
 
 </LinearLayout>

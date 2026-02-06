@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.marketplaceapp.R
 import com.example.marketplaceapp.data.CartItem
 import com.example.marketplaceapp.databinding.ItemCartBinding
 
@@ -34,8 +35,10 @@ class CartAdapter(
         }
 
         fun bind(cartItem: CartItem) {
+            val context = itemView.context
             binding.tvCartItemTitle.text = cartItem.item.title
-            binding.tvCartItemPrice.text = "${cartItem.item.price} $"
+            binding.tvCartItemQuantity.text = cartItem.quantity.toString()
+            binding.tvCartItemPrice.text = context.getString(R.string.price_format, (cartItem.item.price * cartItem.quantity).toString())
         }
     }
 

@@ -6,7 +6,7 @@ plugins {
     id("kotlin-parcelize")
     id("com.google.gms.google-services")
     alias(libs.plugins.google.firebase.crashlytics)
-    id("dagger.hilt.android.plugin")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -45,6 +45,9 @@ android {
 }
 
 dependencies {
+    // Lottie Animation
+    implementation("com.airbnb.android:lottie:6.4.1")
+
     // Hilt
     implementation("com.google.dagger:hilt-android:2.51.1")
     ksp("com.google.dagger:hilt-compiler:2.51.1")

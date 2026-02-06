@@ -1,13 +1,13 @@
 package com.example.marketplaceapp.ui.fragments
 
+import android.app.AlertDialog
+import android.app.Dialog
 import android.location.Location
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -20,6 +20,7 @@ import com.example.marketplaceapp.data.MarketItem
 import com.example.marketplaceapp.databinding.FragmentDetailBinding
 import com.example.marketplaceapp.viewmodel.MarketViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -30,12 +31,16 @@ class DetailFragment : Fragment() {
     private val viewModel: MarketViewModel by activityViewModels()
     private val args: DetailFragmentArgs by navArgs()
     private var currentItem: MarketItem? = null
+    private var deleteDialog: Dialog? = null
+    private var addToCartDialog: Dialog? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentDetailBinding.inflate(inflater, container, false)
+        setupDeleteDialog()
+        setupAddToCartDialog()
         return binding.root
     }
 
@@ -48,7 +53,6 @@ class DetailFragment : Fragment() {
                 binding.tvDetailTitle.text = it.title
                 binding.tvDetailPrice.text = getString(R.string.price_format, it.price.toString())
                 binding.tvDetailDescription.text = it.description
-                binding.tvDetailPhone.text = it.contactPhone
 
                 if (it.imageUri != null) {
                     Glide.with(this)
@@ -84,6 +88,35 @@ class DetailFragment : Fragment() {
         binding.btnDelete.setOnClickListener {
             showDeleteConfirmationDialog()
         }
+
+        binding.btnAddToCartFromDetail.setOnClickListener {
+            currentItem?.let {
+                viewModel.addToCart(it)
+                showAddToCartAnimation()
+            }
+        }
+    }
+
+    private fun setupDeleteDialog() {
+        val dialog = Dialog(requireContext(), R.style.Theme_MarketplaceApp_Dialog_Transparent)
+        dialog.setContentView(R.layout.dialog_delete)
+        dialog.setCancelable(false)
+        deleteDialog = dialog
+    }
+
+    private fun setupAddToCartDialog() {
+        val dialog = Dialog(requireContext(), R.style.Theme_MarketplaceApp_Dialog_Transparent)
+        dialog.setContentView(R.layout.dialog_add_to_cart)
+        dialog.setCancelable(false)
+        addToCartDialog = dialog
+    }
+
+    private fun showAddToCartAnimation() {
+        lifecycleScope.launch {
+            addToCartDialog?.show()
+            delay(1500) 
+            addToCartDialog?.dismiss()
+        }
     }
 
     private fun showDeleteConfirmationDialog() {
@@ -101,7 +134,11 @@ class DetailFragment : Fragment() {
 
     private fun deleteItem(itemId: String) {
         lifecycleScope.launch {
+            deleteDialog?.show()
             val success = viewModel.delete(itemId)
+            delay(2000) // Show animation
+            deleteDialog?.dismiss()
+
             if (success) {
                 Toast.makeText(context, "Item deleted", Toast.LENGTH_SHORT).show()
                 findNavController().popBackStack()
@@ -113,6 +150,8 @@ class DetailFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        deleteDialog?.dismiss()
+        addToCartDialog?.dismiss()
         _binding = null
     }
 }

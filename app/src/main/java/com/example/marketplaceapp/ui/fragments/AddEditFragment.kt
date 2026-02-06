@@ -1,5 +1,6 @@
 package com.example.marketplaceapp.ui.fragments
 
+import android.app.Dialog
 import android.content.Intent
 import android.location.Location
 import android.net.Uri
@@ -24,6 +25,7 @@ import com.example.marketplaceapp.databinding.FragmentAddEditBinding
 import com.example.marketplaceapp.viewmodel.MarketViewModel
 import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -37,6 +39,7 @@ class AddEditFragment : Fragment() {
     private var selectedImageUri: Uri? = null
     private var itemLocation: Location? = null
     private var currentItem: MarketItem? = null
+    private var savingDialog: Dialog? = null
 
     private val pickImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let { imageUri ->
@@ -56,6 +59,7 @@ class AddEditFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentAddEditBinding.inflate(inflater, container, false)
+        setupSavingDialog()
         return binding.root
     }
 
@@ -68,9 +72,8 @@ class AddEditFragment : Fragment() {
             getString(R.string.category_art),
             getString(R.string.category_technology)
         )
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categories)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.spinnerCategory.adapter = adapter
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, categories)
+        binding.spinnerCategory.setAdapter(adapter)
 
         val isEditMode = args.itemId != null
 
@@ -83,6 +86,7 @@ class AddEditFragment : Fragment() {
                         binding.etDescription.setText(currentItemData.description)
                         binding.etPrice.setText(currentItemData.price.toString())
                         binding.etPhone.setText(currentItemData.contactPhone)
+                        binding.spinnerCategory.setText(currentItemData.category, false)
 
                         if (currentItemData.imageUri != null) {
                             selectedImageUri = currentItemData.imageUri.toUri()
@@ -95,11 +99,6 @@ class AddEditFragment : Fragment() {
                                 latitude = currentItemData.latitude
                                 longitude = currentItemData.longitude
                             }
-                        }
-
-                        val categoryIndex = categories.indexOf(currentItemData.category)
-                        if (categoryIndex >= 0) {
-                            binding.spinnerCategory.setSelection(categoryIndex)
                         }
                     }
                 }
@@ -123,17 +122,25 @@ class AddEditFragment : Fragment() {
         }
     }
 
+    private fun setupSavingDialog() {
+        val dialog = Dialog(requireContext(), R.style.Theme_MarketplaceApp_Dialog_Transparent)
+        dialog.setContentView(R.layout.dialog_loading)
+        dialog.setCancelable(false)
+        savingDialog = dialog
+    }
+
     private fun saveItem(isEditMode: Boolean) {
-        binding.btnSave.isEnabled = false 
+        savingDialog?.show()
+
         val title = binding.etTitle.text.toString().trim()
         val desc = binding.etDescription.text.toString().trim()
         val priceStr = binding.etPrice.text.toString().trim()
         val phone = binding.etPhone.text.toString().trim()
-        val selectedCategory = binding.spinnerCategory.selectedItem.toString()
+        val selectedCategory = binding.spinnerCategory.text.toString()
 
-        if (title.isBlank() || desc.isBlank() || priceStr.isBlank() || phone.isBlank()) {
+        if (title.isBlank() || desc.isBlank() || priceStr.isBlank() || phone.isBlank() || selectedCategory.isBlank()) {
             Toast.makeText(context, getString(R.string.please_fill_all_fields), Toast.LENGTH_SHORT).show()
-            binding.btnSave.isEnabled = true
+            savingDialog?.dismiss()
             return
         }
 
@@ -144,7 +151,7 @@ class AddEditFragment : Fragment() {
             val storageRef = FirebaseStorage.getInstance().reference.child(imagePath)
 
             selectedImageUri?.let { imageToUpload ->
-                storageRef.putFile(imageToUpload).addOnSuccessListener { _ -> // uploadTaskSnapshot
+                storageRef.putFile(imageToUpload).addOnSuccessListener { _ ->
                     storageRef.downloadUrl.addOnSuccessListener { downloadedUri: Uri ->
                         val publicImageUrl = downloadedUri.toString()
                         performSave(isEditMode, title, desc, price, phone, selectedCategory, publicImageUrl)
@@ -152,7 +159,7 @@ class AddEditFragment : Fragment() {
                 }.addOnFailureListener { exception ->
                     Log.e("AddEditFragment", "Image upload failed", exception)
                     Toast.makeText(context, getString(R.string.image_upload_failed), Toast.LENGTH_SHORT).show()
-                    binding.btnSave.isEnabled = true
+                    savingDialog?.dismiss()
                 }
             }
         } else {
@@ -183,16 +190,19 @@ class AddEditFragment : Fragment() {
             }
 
             if (success) {
+                delay(2000)
+                savingDialog?.dismiss()
                 findNavController().popBackStack()
             } else {
+                savingDialog?.dismiss()
                 Toast.makeText(context, "Save failed. Check logs for details.", Toast.LENGTH_LONG).show()
-                binding.btnSave.isEnabled = true
             }
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        savingDialog?.dismiss()
         _binding = null
     }
 }

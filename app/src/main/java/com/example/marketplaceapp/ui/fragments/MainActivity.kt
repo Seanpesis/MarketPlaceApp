@@ -48,17 +48,13 @@ class MainActivity : AppCompatActivity() {
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
 
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
 
         setupActionBarWithNavController(navController)
-
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            supportActionBar?.title = "Marketplace"
-            supportActionBar?.subtitle = destination.label
-        }
 
         checkLocationPermission()
     }
@@ -120,8 +116,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Let the NavController handle the item selection
-        // This will automatically navigate to the correct destination (e.g., aboutFragment)
         return item.onNavDestinationSelected(navController) || super.onOptionsItemSelected(item)
     }
 }
