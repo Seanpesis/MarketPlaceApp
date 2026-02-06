@@ -11,8 +11,10 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
@@ -22,6 +24,7 @@ import com.example.marketplaceapp.databinding.FragmentAddEditBinding
 import com.example.marketplaceapp.viewmodel.MarketViewModel
 import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class AddEditFragment : Fragment() {
@@ -82,7 +85,7 @@ class AddEditFragment : Fragment() {
                         binding.etPhone.setText(currentItemData.contactPhone)
 
                         if (currentItemData.imageUri != null) {
-                            selectedImageUri = Uri.parse(currentItemData.imageUri)
+                            selectedImageUri = currentItemData.imageUri.toUri()
                             Glide.with(this).load(selectedImageUri).into(binding.ivPreview)
                         }
 
@@ -121,6 +124,7 @@ class AddEditFragment : Fragment() {
     }
 
     private fun saveItem(isEditMode: Boolean) {
+        binding.btnSave.isEnabled = false 
         val title = binding.etTitle.text.toString().trim()
         val desc = binding.etDescription.text.toString().trim()
         val priceStr = binding.etPrice.text.toString().trim()
@@ -129,6 +133,7 @@ class AddEditFragment : Fragment() {
 
         if (title.isBlank() || desc.isBlank() || priceStr.isBlank() || phone.isBlank()) {
             Toast.makeText(context, getString(R.string.please_fill_all_fields), Toast.LENGTH_SHORT).show()
+            binding.btnSave.isEnabled = true
             return
         }
 
@@ -139,7 +144,7 @@ class AddEditFragment : Fragment() {
             val storageRef = FirebaseStorage.getInstance().reference.child(imagePath)
 
             selectedImageUri?.let { imageToUpload ->
-                storageRef.putFile(imageToUpload).addOnSuccessListener { _ ->
+                storageRef.putFile(imageToUpload).addOnSuccessListener { _ -> // uploadTaskSnapshot
                     storageRef.downloadUrl.addOnSuccessListener { downloadedUri: Uri ->
                         val publicImageUrl = downloadedUri.toString()
                         performSave(isEditMode, title, desc, price, phone, selectedCategory, publicImageUrl)
@@ -147,6 +152,7 @@ class AddEditFragment : Fragment() {
                 }.addOnFailureListener { exception ->
                     Log.e("AddEditFragment", "Image upload failed", exception)
                     Toast.makeText(context, getString(R.string.image_upload_failed), Toast.LENGTH_SHORT).show()
+                    binding.btnSave.isEnabled = true
                 }
             }
         } else {
@@ -169,13 +175,20 @@ class AddEditFragment : Fragment() {
             longitude = itemLocation?.longitude
         )
 
-        if (isEditMode) {
-            viewModel.update(itemToSave)
-        } else {
-            viewModel.insert(itemToSave)
-        }
+        lifecycleScope.launch {
+            val success = if (isEditMode) {
+                viewModel.update(itemToSave)
+            } else {
+                viewModel.insert(itemToSave)
+            }
 
-        findNavController().popBackStack()
+            if (success) {
+                findNavController().popBackStack()
+            } else {
+                Toast.makeText(context, "Save failed. Check logs for details.", Toast.LENGTH_LONG).show()
+                binding.btnSave.isEnabled = true
+            }
+        }
     }
 
     override fun onDestroyView() {

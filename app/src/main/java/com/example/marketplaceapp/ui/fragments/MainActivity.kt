@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
@@ -15,6 +16,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.example.marketplaceapp.R
 import com.example.marketplaceapp.data.CartManager
@@ -101,7 +103,6 @@ class MainActivity : AppCompatActivity() {
         val actionView = cartItem.actionView
         val badgeTextView = actionView?.findViewById<TextView>(R.id.cart_badge)
 
-
         CartManager.totalItemsCount.observe(this) { count ->
             if (count > 0) {
                 badgeTextView?.text = count.toString()
@@ -111,12 +112,16 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-
         actionView?.setOnClickListener {
             navController.navigate(R.id.cartFragment)
-
         }
 
         return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Let the NavController handle the item selection
+        // This will automatically navigate to the correct destination (e.g., aboutFragment)
+        return item.onNavDestinationSelected(navController) || super.onOptionsItemSelected(item)
     }
 }

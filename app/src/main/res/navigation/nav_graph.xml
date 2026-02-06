@@ -17,9 +17,6 @@
             android:id="@+id/action_listFragment_to_detailFragment"
             app:destination="@id/detailFragment" />
         <action
-            android:id="@+id/action_listFragment_to_aboutFragment"
-            app:destination="@id/aboutFragment" />
-        <action
             android:id="@+id/action_listFragment_to_cartFragment"
             app:destination="@id/cartFragment" />
     </fragment>
@@ -60,7 +57,7 @@
         android:label="Shopping Cart"
         tools:layout="@layout/fragment_cart" />
 
-
-
+    <action android:id="@+id/action_global_aboutFragment"
+        app:destination="@id/aboutFragment"/>
 
 </navigation>

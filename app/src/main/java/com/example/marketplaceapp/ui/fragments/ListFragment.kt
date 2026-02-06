@@ -2,16 +2,10 @@ package com.example.marketplaceapp.ui.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.marketplaceapp.R
@@ -26,7 +20,6 @@ class ListFragment : Fragment() {
     private var _binding: FragmentListBinding? = null
     private val binding get() = _binding!!
     private val viewModel: MarketViewModel by activityViewModels()
-    private var cartBadge: TextView? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,8 +31,6 @@ class ListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        setupMenu()
 
         val adapter = MarketAdapter(
             onItemClick = { item ->
@@ -63,10 +54,6 @@ class ListFragment : Fragment() {
             location?.let { adapter.updateUserLocation(it) }
         }
 
-        viewModel.cartItems.observe(viewLifecycleOwner) { cartItems ->
-            updateCartBadge(cartItems.sumOf { it.quantity })
-        }
-
         binding.fabAdd.setOnClickListener {
             val action = ListFragmentDirections.actionListFragmentToAddEditFragment(null)
             findNavController().navigate(action)
@@ -84,44 +71,6 @@ class ListFragment : Fragment() {
             viewModel.setFilter(category)
         }
         binding.chipGroup.check(R.id.btnFilterAll)
-    }
-
-    private fun setupMenu() {
-        requireActivity().addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.main_menu, menu)
-                val cartItem = menu.findItem(R.id.action_cart)
-                val actionView = cartItem.actionView
-                cartBadge = actionView?.findViewById(R.id.cart_badge)
-                actionView?.setOnClickListener {
-                    onMenuItemSelected(cartItem)
-                }
-                updateCartBadge(viewModel.cartItems.value?.sumOf { it.quantity } ?: 0)
-            }
-
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                return when (menuItem.itemId) {
-                    R.id.action_about -> {
-                        findNavController().navigate(ListFragmentDirections.actionListFragmentToAboutFragment())
-                        true
-                    }
-                    R.id.action_cart -> {
-                        findNavController().navigate(ListFragmentDirections.actionListFragmentToCartFragment())
-                        true
-                    }
-                    else -> false
-                }
-            }
-        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
-    }
-
-    private fun updateCartBadge(count: Int) {
-        if (count > 0) {
-            cartBadge?.visibility = View.VISIBLE
-            cartBadge?.text = count.toString()
-        } else {
-            cartBadge?.visibility = View.GONE
-        }
     }
 
     override fun onDestroyView() {

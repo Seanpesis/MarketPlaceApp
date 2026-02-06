@@ -10,7 +10,7 @@
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/action_about"
+        android:id="@+id/action_global_aboutFragment"
         android:title="@string/about"
         android:icon="@android:drawable/ic_menu_info_details"
         app:showAsAction="ifRoom" />

@@ -12,7 +12,9 @@ import com.example.marketplaceapp.data.CartManager
 import com.example.marketplaceapp.data.MarketItem
 import com.example.marketplaceapp.data.MarketRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,7 +23,7 @@ class MarketViewModel @Inject constructor(
     application: Application
 ) : AndroidViewModel(application) {
 
-    private val _allItems = MutableLiveData<List<MarketItem>>()
+    private val _allItems: LiveData<List<MarketItem>> = repository.getAllItems()
     private val _currentLocation = MutableLiveData<Location>()
     private val _filterCategory = MutableLiveData("All")
 
@@ -31,21 +33,14 @@ class MarketViewModel @Inject constructor(
     val finalItemList = MediatorLiveData<List<MarketItem>>()
 
     init {
-        loadAllItems()
         finalItemList.addSource(_allItems) { items -> combineFilterAndSort(items, _currentLocation.value, _filterCategory.value) }
         finalItemList.addSource(_currentLocation) { location -> combineFilterAndSort(_allItems.value, location, _filterCategory.value) }
         finalItemList.addSource(_filterCategory) { category -> combineFilterAndSort(_allItems.value, _currentLocation.value, category) }
     }
 
-    private fun loadAllItems() {
-        viewModelScope.launch {
-            _allItems.value = repository.getAllItems()
-        }
-    }
-
     private fun combineFilterAndSort(items: List<MarketItem>?, location: Location?, category: String?) {
-        viewModelScope.launch {
-            val currentItems = items ?: _allItems.value ?: return@launch
+        viewModelScope.launch(Dispatchers.Default) {
+            val currentItems = items ?: return@launch
 
             val filteredItems = if (category == null || category == "All") {
                 currentItems
@@ -66,10 +61,12 @@ class MarketViewModel @Inject constructor(
                             return@sortedBy location.distanceTo(itemLocation)
                         }
                     }
-                    Float.MAX_VALUE
+                    Float.MAX_VALUE // Put items without location at the end
                 }
             }
-            finalItemList.value = sortedItems
+            withContext(Dispatchers.Main) {
+                finalItemList.value = sortedItems
+            }
         }
     }
 
@@ -89,19 +86,19 @@ class MarketViewModel @Inject constructor(
         return itemLiveData
     }
 
-    fun insert(item: MarketItem) {
-        viewModelScope.launch {
-            repository.insertItem(item)
-            loadAllItems()
-        }
+    suspend fun insert(item: MarketItem): Boolean {
+        return repository.insertItem(item)
     }
 
-    fun update(item: MarketItem) {
-        viewModelScope.launch {
-            repository.updateItem(item)
-            loadAllItems()
-        }
+    suspend fun update(item: MarketItem): Boolean {
+        return repository.updateItem(item)
     }
+
+    suspend fun delete(itemId: String): Boolean {
+        return repository.deleteItem(itemId)
+    }
+
+    // --- Cart Functions ---
     fun addToCart(marketItem: MarketItem) {
         CartManager.addToCart(marketItem)
     }
