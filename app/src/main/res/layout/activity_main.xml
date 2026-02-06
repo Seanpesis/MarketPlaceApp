@@ -27,10 +27,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
+                android:fontFamily="@font/assistant_bold"
                 android:text="@string/app_name"
                 android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
                 android:textColor="@color/primary_text"
                 android:textStyle="bold" />
+
 
         </androidx.appcompat.widget.Toolbar>
 

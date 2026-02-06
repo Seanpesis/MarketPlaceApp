@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Marketplace</string>
+    <string name="app_name">MarketPlace</string>
     <string name="title">Title</string>
     <string name="price">Price</string>
     <string name="description">Description</string>

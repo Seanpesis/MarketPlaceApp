@@ -40,6 +40,7 @@
                 android:maxLines="1"
                 android:ellipsize="end"
                 android:text="Product Name"
+                android:textSize="18sp"
                 android:textAppearance="?attr/textAppearanceTitleLarge"
                 android:textColor="@color/primary_text"
                 android:textStyle="bold" />
@@ -61,9 +62,9 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                app:icon="@android:drawable/ic_input_add"
-                app:cornerRadius="24dp" />
+                android:layout_marginEnd="13dp"
+                app:cornerRadius="24dp"
+                app:icon="@android:drawable/ic_input_add" />
 
         </RelativeLayout>
     </LinearLayout>

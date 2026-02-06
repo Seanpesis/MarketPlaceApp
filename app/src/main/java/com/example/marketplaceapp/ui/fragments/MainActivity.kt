@@ -56,7 +56,14 @@ class MainActivity : AppCompatActivity() {
 
         setupActionBarWithNavController(navController)
 
+        val toolbar_title = findViewById<TextView>(R.id.toolbar_title)
+        toolbar_title.setOnClickListener {    navController.popBackStack(R.id.listFragment, false)
+        }
+
         checkLocationPermission()
+
+
+
     }
 
     private fun checkLocationPermission() {

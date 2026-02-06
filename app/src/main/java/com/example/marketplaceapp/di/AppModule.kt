@@ -10,7 +10,11 @@ import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
-
+import android.content.Context
+import androidx.room.Room
+import com.example.marketplaceapp.data.AppDatabase
+import com.example.marketplaceapp.data.ProductDao
+import dagger.hilt.android.qualifiers.ApplicationContext
 @Module
 @InstallIn(SingletonComponent::class)
 @Suppress("unused")
@@ -42,4 +46,21 @@ object AppModule {
     fun provideApiService(retrofit: Retrofit): FakeStoreApiService {
         return retrofit.create(FakeStoreApiService::class.java)
     }
+
+    @Provides
+    @Singleton
+    fun provideDatabase(@ApplicationContext context: Context): AppDatabase {
+        return Room.databaseBuilder(
+            context,
+            AppDatabase::class.java,
+            "marketplace_db"
+        ).build()
+    }
+
+    @Provides
+    @Singleton // Added Singleton here too
+    fun provideProductDao(database: AppDatabase): ProductDao {
+        return database.productDao()
+    }
 }
+
