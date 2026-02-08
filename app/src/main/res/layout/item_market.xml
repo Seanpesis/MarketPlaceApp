@@ -35,8 +35,8 @@
                 android:id="@+id/tvTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_toStartOf="@+id/btnAddToCart"
-                android:layout_marginEnd="16dp"
+                android:layout_toStartOf="@+id/btnFavorite"
+                android:layout_marginEnd="8dp"
                 android:maxLines="1"
                 android:ellipsize="end"
                 android:text="Product Name"
@@ -56,13 +56,23 @@
                 android:textColor="@color/brand_primary"
                 android:textStyle="bold" />
 
+            <ImageButton
+                android:id="@+id/btnFavorite"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Add to Favorites"
+                android:src="@drawable/ic_favorite_border" />
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAddToCart"
                 style="@style/Widget.Material3.Button.IconButton.Filled"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:layout_alignParentEnd="true"
-                android:layout_marginEnd="13dp"
+                android:layout_toStartOf="@+id/btnFavorite"
+                android:layout_marginEnd="8dp"
                 app:cornerRadius="24dp"
                 app:icon="@android:drawable/ic_input_add" />
 

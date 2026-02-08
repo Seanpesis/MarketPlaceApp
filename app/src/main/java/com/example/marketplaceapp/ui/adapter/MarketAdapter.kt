@@ -16,8 +16,20 @@ import com.example.marketplaceapp.databinding.ItemMarketBinding
 class MarketAdapter(
     private val onItemClick: (MarketItem) -> Unit,
     private val onAddToCartClick: (MarketItem) -> Unit,
+    private val onFavoriteClick: (MarketItem) -> Unit,
     private var userLocation: Location?
 ) : ListAdapter<MarketItem, MarketAdapter.MarketViewHolder>(DiffCallback()) {
+
+    private val favoriteIds = mutableSetOf<String>()
+
+    fun updateFavoriteIds(newFavoriteIds: Set<String>) {
+        val changed = favoriteIds != newFavoriteIds
+        favoriteIds.clear()
+        favoriteIds.addAll(newFavoriteIds)
+        if (changed && itemCount > 0) {
+            notifyItemRangeChanged(0, itemCount)
+        }
+    }
 
     fun updateUserLocation(location: Location) {
         userLocation = location
@@ -51,12 +63,22 @@ class MarketAdapter(
                     onAddToCartClick(getItem(adapterPosition))
                 }
             }
+            binding.btnFavorite.setOnClickListener {
+                if (adapterPosition != RecyclerView.NO_POSITION) {
+                    onFavoriteClick(getItem(adapterPosition))
+                }
+            }
         }
 
         fun bind(item: MarketItem) {
             val context = itemView.context
             binding.tvTitle.text = item.title
             binding.tvPrice.text = context.getString(R.string.price_format, item.price.toString())
+
+            val isFavorite = this@MarketAdapter.favoriteIds.contains(item.id)
+            binding.btnFavorite.setImageResource(
+                if (isFavorite) R.drawable.ic_favorite else R.drawable.ic_favorite_border
+            )
 
             val imageUri = item.imageUri
             if (imageUri != null) {

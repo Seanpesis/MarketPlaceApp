@@ -13,6 +13,8 @@ import javax.inject.Singleton
 import android.content.Context
 import androidx.room.Room
 import com.example.marketplaceapp.data.AppDatabase
+import com.example.marketplaceapp.data.FavoriteDao
+import com.example.marketplaceapp.data.LocalDatabase
 import com.example.marketplaceapp.data.ProductDao
 import dagger.hilt.android.qualifiers.ApplicationContext
 @Module
@@ -58,9 +60,25 @@ object AppModule {
     }
 
     @Provides
-    @Singleton // Added Singleton here too
+    @Singleton
     fun provideProductDao(database: AppDatabase): ProductDao {
         return database.productDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideLocalDatabase(@ApplicationContext context: Context): LocalDatabase {
+        return Room.databaseBuilder(
+            context,
+            LocalDatabase::class.java,
+            "favorites_db"
+        ).build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideFavoriteDao(database: LocalDatabase): FavoriteDao {
+        return database.favoriteDao()
     }
 }
 

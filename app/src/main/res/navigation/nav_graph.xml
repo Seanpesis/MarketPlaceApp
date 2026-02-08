@@ -57,6 +57,12 @@
         android:label="Shopping Cart"
         tools:layout="@layout/fragment_cart" />
 
+    <fragment
+        android:id="@+id/favoritesFragment"
+        android:name="com.example.marketplaceapp.ui.fragments.FavoritesFragment"
+        android:label="Favorites"
+        tools:layout="@layout/fragment_favorites" />
+
     <action android:id="@+id/action_global_aboutFragment"
         app:destination="@id/aboutFragment"/>
 
