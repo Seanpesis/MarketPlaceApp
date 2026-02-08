@@ -20,19 +20,17 @@ class MarketAdapter(
     private var userLocation: Location?
 ) : ListAdapter<MarketItem, MarketAdapter.MarketViewHolder>(DiffCallback()) {
 
-    private val favoriteIds = mutableSetOf<String>()
+    private var favoriteIds = setOf<String>()
 
-    fun updateFavoriteIds(newFavoriteIds: Set<String>) {
-        val changed = favoriteIds != newFavoriteIds
-        favoriteIds.clear()
-        favoriteIds.addAll(newFavoriteIds)
-        if (changed && itemCount > 0) {
+    fun updateUserLocation(location: Location) {
+        userLocation = location
+        if (itemCount > 0) {
             notifyItemRangeChanged(0, itemCount)
         }
     }
 
-    fun updateUserLocation(location: Location) {
-        userLocation = location
+    fun updateFavoriteIds(newFavoriteIds: Set<String>) {
+        favoriteIds = newFavoriteIds
         if (itemCount > 0) {
             notifyItemRangeChanged(0, itemCount)
         }
@@ -63,7 +61,7 @@ class MarketAdapter(
                     onAddToCartClick(getItem(adapterPosition))
                 }
             }
-            binding.btnFavorite.setOnClickListener {
+            binding.btnLike.setOnClickListener {
                 if (adapterPosition != RecyclerView.NO_POSITION) {
                     onFavoriteClick(getItem(adapterPosition))
                 }
@@ -75,10 +73,11 @@ class MarketAdapter(
             binding.tvTitle.text = item.title
             binding.tvPrice.text = context.getString(R.string.price_format, item.price.toString())
 
-            val isFavorite = this@MarketAdapter.favoriteIds.contains(item.id)
-            binding.btnFavorite.setImageResource(
-                if (isFavorite) R.drawable.ic_favorite else R.drawable.ic_favorite_border
-            )
+            if (favoriteIds.contains(item.id)) {
+                binding.btnLike.setImageResource(R.drawable.ic_favorite_filled)
+            } else {
+                binding.btnLike.setImageResource(R.drawable.ic_favorite_border)
+            }
 
             val imageUri = item.imageUri
             if (imageUri != null) {

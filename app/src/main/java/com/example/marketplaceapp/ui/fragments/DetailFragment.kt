@@ -22,6 +22,7 @@ import com.example.marketplaceapp.viewmodel.MarketViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 @AndroidEntryPoint
 class DetailFragment : Fragment() {
@@ -48,31 +49,31 @@ class DetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.getItem(args.itemId).observe(viewLifecycleOwner) { item ->
-            item?.let {
-                currentItem = it
-                binding.tvDetailTitle.text = it.title
-                binding.tvDetailPrice.text = getString(R.string.price_format, it.price.toString())
-                binding.tvDetailDescription.text = it.description
+            item?.let { currentItemData ->
+                currentItem = currentItemData
+                binding.tvDetailTitle.text = currentItemData.title
+                binding.tvDetailPrice.text = getString(R.string.price_format, currentItemData.price.toString())
+                binding.tvDetailDescription.text = currentItemData.description
 
-                if (it.imageUri != null) {
+                currentItemData.imageUri?.let { uriString ->
                     Glide.with(this)
-                        .load(it.imageUri.toUri())
+                        .load(uriString.toUri())
                         .placeholder(R.drawable.market_icon)
                         .error(R.drawable.market_icon)
                         .into(binding.ivDetailImage)
-                } else {
-                    binding.ivDetailImage.setImageResource(R.drawable.market_icon)
-                }
+                } ?: binding.ivDetailImage.setImageResource(R.drawable.market_icon)
 
                 val userLocation = viewModel.currentLocation.value
-                if (userLocation != null && it.latitude != null && it.longitude != null) {
+                val lat = currentItemData.latitude
+                val lon = currentItemData.longitude
+                if (userLocation != null && lat != null && lon != null) {
                     val itemLocation = Location("").apply {
-                        latitude = it.latitude
-                        longitude = it.longitude
+                        latitude = lat
+                        longitude = lon
                     }
                     val distanceInMeters = userLocation.distanceTo(itemLocation)
                     val distanceInKm = distanceInMeters / 1000
-                    binding.tvDetailDistance.text = String.format("%.1f km away", distanceInKm)
+                    binding.tvDetailDistance.text = String.format(Locale.getDefault(), getString(R.string.distance_format), distanceInKm)
                     binding.tvDetailDistance.visibility = View.VISIBLE
                 } else {
                     binding.tvDetailDistance.visibility = View.GONE
@@ -136,14 +137,14 @@ class DetailFragment : Fragment() {
         lifecycleScope.launch {
             deleteDialog?.show()
             val success = viewModel.delete(itemId)
-            delay(2000) // Show animation
+            delay(2000)
             deleteDialog?.dismiss()
 
             if (success) {
-                Toast.makeText(context, "Item deleted", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, getString(R.string.item_deleted_successfully), Toast.LENGTH_SHORT).show()
                 findNavController().popBackStack()
             } else {
-                Toast.makeText(context, "Delete failed. Check logs.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, getString(R.string.delete_failed), Toast.LENGTH_SHORT).show()
             }
         }
     }

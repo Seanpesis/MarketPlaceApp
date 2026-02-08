@@ -5,11 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marketplaceapp.databinding.FragmentFavoritesBinding
 import com.example.marketplaceapp.ui.adapter.FavoritesAdapter
-import com.example.marketplaceapp.viewmodel.FavoritesViewModel
+import com.example.marketplaceapp.viewmodel.MarketViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -17,7 +17,7 @@ class FavoritesFragment : Fragment() {
 
     private var _binding: FragmentFavoritesBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: FavoritesViewModel by viewModels()
+    private val viewModel: MarketViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,18 +31,18 @@ class FavoritesFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val adapter = FavoritesAdapter(
-            onItemClick = { item ->
+            onItemClick = { _ ->
             },
-            onDeleteClick = { item ->
-                viewModel.removeFavorite(item)
+            onDeleteClick = {
+                viewModel.removeFavorite(it.id)
             }
         )
 
-        binding.recyclerView.layoutManager = GridLayoutManager(context, 2)
-        binding.recyclerView.adapter = adapter
+        binding.rvFavorites.layoutManager = LinearLayoutManager(context)
+        binding.rvFavorites.adapter = adapter
 
-        viewModel.allFavorites.observe(viewLifecycleOwner) { favorites ->
-            favorites?.let { adapter.submitList(it) }
+        viewModel.favoriteItems.observe(viewLifecycleOwner) {
+            adapter.submitList(it)
         }
     }
 
@@ -51,5 +51,3 @@ class FavoritesFragment : Fragment() {
         _binding = null
     }
 }
-
-

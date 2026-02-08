@@ -26,22 +26,20 @@
             app:shapeAppearanceOverlay="@style/RoundedTopCorners"
             tools:src="@tools:sample/backgrounds/scenic" />
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:padding="16dp">
 
             <TextView
                 android:id="@+id/tvTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_toStartOf="@+id/btnFavorite"
-                android:layout_marginEnd="8dp"
                 android:maxLines="1"
                 android:ellipsize="end"
-                android:text="Product Name"
-                android:textSize="18sp"
-                android:textAppearance="?attr/textAppearanceTitleLarge"
+                android:text="@string/item_card_product_name_placeholder"
+                android:textAppearance="?attr/textAppearanceTitleMedium"
                 android:textColor="@color/primary_text"
                 android:textStyle="bold" />
 
@@ -49,33 +47,47 @@
                 android:id="@+id/tvPrice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/tvTitle"
                 android:layout_marginTop="4dp"
-                android:text="$99.99"
+                android:text="@string/item_card_price_placeholder"
                 android:textAppearance="?attr/textAppearanceBodyLarge"
                 android:textColor="@color/brand_primary"
                 android:textStyle="bold" />
 
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#E0E0E0" 
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end"
+            android:padding="8dp">
+
             <ImageButton
-                android:id="@+id/btnFavorite"
+                android:id="@+id/btnLike"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:layout_alignParentEnd="true"
-                android:layout_marginEnd="8dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Add to Favorites"
-                android:src="@drawable/ic_favorite_border" />
+                android:contentDescription="@string/item_card_like_button_description"
+                app:srcCompat="@drawable/ic_favorite_border"
+                app:tint="@color/brand_primary" />
 
-            <com.google.android.material.button.MaterialButton
+            <ImageButton
                 android:id="@+id/btnAddToCart"
-                style="@style/Widget.Material3.Button.IconButton.Filled"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:layout_toStartOf="@+id/btnFavorite"
-                android:layout_marginEnd="8dp"
-                app:cornerRadius="24dp"
-                app:icon="@android:drawable/ic_input_add" />
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/item_card_add_to_cart_button_description"
+                app:srcCompat="@android:drawable/ic_input_add"
+                app:tint="@color/brand_primary" />
 
-        </RelativeLayout>
+        </LinearLayout>
+
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

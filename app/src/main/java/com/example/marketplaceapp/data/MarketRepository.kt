@@ -3,6 +3,7 @@ package com.example.marketplaceapp.data
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.map
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -10,10 +11,11 @@ import javax.inject.Singleton
 
 @Singleton
 class MarketRepository @Inject constructor(
-    firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore
 ) {
 
     private val itemsCollection = firestore.collection("items")
+    private val favoritesCollection = firestore.collection("favorites")
 
     fun getAllItems(): LiveData<List<MarketItem>> {
         val liveData = MutableLiveData<List<MarketItem>>()
@@ -25,7 +27,11 @@ class MarketRepository @Inject constructor(
             }
 
             if (snapshot != null) {
-                val items = snapshot.toObjects(MarketItem::class.java)
+                val items = snapshot.documents.mapNotNull { doc ->
+                    val item = doc.toObject(MarketItem::class.java)
+                    item?.id = doc.id // Manually set the ID
+                    item
+                }
                 Log.d("MarketRepository", "Loaded ${items.size} items from Firestore.")
                 liveData.value = items
             } else {
@@ -37,7 +43,9 @@ class MarketRepository @Inject constructor(
 
     suspend fun insertItem(item: MarketItem): Boolean {
         return try {
-            itemsCollection.add(item).await()
+            val docRef = itemsCollection.document()
+            item.id = docRef.id // Assign ID before saving
+            docRef.set(item).await()
             Log.d("MarketRepository", "Item added successfully")
             true
         } catch (e: Exception) {
@@ -73,10 +81,51 @@ class MarketRepository @Inject constructor(
     suspend fun getItem(itemId: String): MarketItem? {
         return try {
             val snapshot = itemsCollection.document(itemId).get().await()
-            snapshot.toObject(MarketItem::class.java)
+            val item = snapshot.toObject(MarketItem::class.java)
+            item?.id = snapshot.id // Manually set the ID
+            item
         } catch (e: Exception) {
             Log.w("MarketRepository", "Error getting single item.", e)
             null
+        }
+    }
+
+    fun getFavoriteItems(): LiveData<List<FavoriteItem>> {
+        val liveData = MutableLiveData<List<FavoriteItem>>()
+        favoritesCollection.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                liveData.value = emptyList()
+                return@addSnapshotListener
+            }
+            snapshot?.let {
+                val favoriteItems = it.documents.mapNotNull { doc ->
+                    val item = doc.toObject(FavoriteItem::class.java)
+                    item?.id = doc.id
+                    item
+                }
+                liveData.value = favoriteItems
+            }
+        }
+        return liveData
+    }
+
+    fun getFavoriteItemIds(): LiveData<Set<String>> {
+        return getFavoriteItems().map { it.map { item -> item.id }.toSet() }
+    }
+
+    suspend fun addFavorite(favoriteItem: FavoriteItem) {
+        try {
+            favoritesCollection.document(favoriteItem.id).set(favoriteItem).await()
+        } catch (e: Exception) {
+             Log.w("MarketRepository", "Error adding favorite", e)
+        }
+    }
+
+    suspend fun removeFavorite(itemId: String) {
+         try {
+            favoritesCollection.document(itemId).delete().await()
+        } catch (e: Exception) {
+             Log.w("MarketRepository", "Error removing favorite", e)
         }
     }
 }

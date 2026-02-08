@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.marketplaceapp.data.CartItem
 import com.example.marketplaceapp.data.CartManager
+import com.example.marketplaceapp.data.FavoriteItem
 import com.example.marketplaceapp.data.MarketItem
 import com.example.marketplaceapp.data.MarketRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,6 +32,9 @@ class MarketViewModel @Inject constructor(
     val cartItems: LiveData<List<CartItem>> = CartManager.cartItems
 
     val finalItemList = MediatorLiveData<List<MarketItem>>()
+
+    val favoriteItems: LiveData<List<FavoriteItem>> = repository.getFavoriteItems()
+    val favoriteItemIds: LiveData<Set<String>> = repository.getFavoriteItemIds()
 
     init {
         finalItemList.addSource(_allItems) { items -> combineFilterAndSort(items, _currentLocation.value, _filterCategory.value) }
@@ -108,5 +112,30 @@ class MarketViewModel @Inject constructor(
 
     fun clearCart() {
         CartManager.clearCart()
+    }
+    
+    fun toggleFavorite(item: MarketItem) {
+        viewModelScope.launch {
+            if (item.id.isEmpty()) return@launch
+
+            if (favoriteItemIds.value?.contains(item.id) == true) {
+                repository.removeFavorite(item.id)
+            } else {
+                val favoriteItem = FavoriteItem(
+                    id = item.id,
+                    name = item.title,
+                    price = item.price,
+                    imageUrl = item.imageUri
+                )
+                repository.addFavorite(favoriteItem)
+            }
+        }
+    }
+
+    fun removeFavorite(itemId: String) {
+        viewModelScope.launch {
+            if (itemId.isEmpty()) return@launch
+            repository.removeFavorite(itemId)
+        }
     }
 }

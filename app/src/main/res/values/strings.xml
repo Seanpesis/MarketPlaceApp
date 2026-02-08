@@ -18,6 +18,7 @@
 
     <!-- Formatting -->
     <string name="price_format">%1$s $</string>
+    <string name="distance_format">%.1f km away</string>
 
     <!--    Home Page Categories -->
     <string name="all_btn">All</string>
@@ -49,6 +50,16 @@
     <string name="category_technology">Technology</string>
     <string name="category_general">General</string>
 
+    <!-- Item Card Placeholders and Content Descriptions -->
+    <string name="item_card_product_name_placeholder">Product Name</string>
+    <string name="item_card_price_placeholder">$99.99</string>
+    <string name="item_card_like_button_description">Like item</string>
+    <string name="item_card_add_to_cart_button_description">Add to cart</string>
+
     <!-- Favorites -->
     <string name="favorites">Favorites</string>
+    
+    <!-- Toasts -->
+    <string name="item_deleted_successfully">Item deleted</string>
+    <string name="delete_failed">Delete failed. Check logs.</string>
 </resources>

@@ -88,16 +88,18 @@ class AddEditFragment : Fragment() {
                         binding.etPhone.setText(currentItemData.contactPhone)
                         binding.spinnerCategory.setText(currentItemData.category, false)
 
-                        if (currentItemData.imageUri != null) {
-                            selectedImageUri = currentItemData.imageUri.toUri()
+                        currentItemData.imageUri?.let { uriString ->
+                            selectedImageUri = uriString.toUri()
                             Glide.with(this).load(selectedImageUri).into(binding.ivPreview)
                         }
 
-                        if (currentItemData.latitude != null && currentItemData.longitude != null) {
+                        val lat = currentItemData.latitude
+                        val lon = currentItemData.longitude
+                        if (lat != null && lon != null) {
                             binding.tvLocationStatus.text = getString(R.string.location_added_already)
                             itemLocation = Location("").apply {
-                                latitude = currentItemData.latitude
-                                longitude = currentItemData.longitude
+                                latitude = lat
+                                longitude = lon
                             }
                         }
                     }
