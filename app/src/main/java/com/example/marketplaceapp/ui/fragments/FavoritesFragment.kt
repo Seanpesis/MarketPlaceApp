@@ -11,6 +11,8 @@ import com.example.marketplaceapp.databinding.FragmentFavoritesBinding
 import com.example.marketplaceapp.ui.adapter.FavoritesAdapter
 import com.example.marketplaceapp.viewmodel.MarketViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import androidx.navigation.fragment.findNavController
+import com.example.marketplaceapp.R
 
 @AndroidEntryPoint
 class FavoritesFragment : Fragment() {
@@ -30,11 +32,21 @@ class FavoritesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
         val adapter = FavoritesAdapter(
-            onItemClick = { _ ->
+            onItemClick = { favoriteItem ->
+
+                val bundle = Bundle().apply {
+                    putString("itemId", favoriteItem.id)
+                }
+
+                findNavController().navigate(
+                    R.id.detailFragment,
+                    bundle
+                )
             },
-            onDeleteClick = {
-                viewModel.removeFavorite(it.id)
+            onDeleteClick = { favoriteItem ->
+                viewModel.removeFavorite(favoriteItem.id)
             }
         )
 

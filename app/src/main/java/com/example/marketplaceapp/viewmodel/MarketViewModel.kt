@@ -28,6 +28,8 @@ class MarketViewModel @Inject constructor(
     private val _currentLocation = MutableLiveData<Location>()
     private val _filterCategory = MutableLiveData("All")
 
+    private val _externalApiItems = MutableLiveData<List<MarketItem>>()
+
     val currentLocation: LiveData<Location> get() = _currentLocation
     val cartItems: LiveData<List<CartItem>> = CartManager.cartItems
 
@@ -70,6 +72,38 @@ class MarketViewModel @Inject constructor(
             }
             withContext(Dispatchers.Main) {
                 finalItemList.value = sortedItems
+            }
+        }
+    }
+
+    fun fetchExternalProducts() {
+        viewModelScope.launch(Dispatchers.IO) { // הרצה ברקע
+            try {
+                // הבאת המוצרים מהשרת
+                val apiProducts = repository.fetchApiProducts()
+
+                // המרה של ApiProduct ל-MarketItem כדי שיתאימו לרשימה שלך
+                val mappedItems = apiProducts.map { apiProd ->
+                    MarketItem(
+                        id = apiProd.id.toString(),
+                        title = apiProd.title,
+                        price = apiProd.price,
+                        category = apiProd.category,
+                        imageUri = apiProd.image, // Glide יטען את הכתובת הזו
+                        description = apiProd.description
+                    )
+                }
+                withContext(Dispatchers.Main) {
+
+                    finalItemList.addSource(_externalApiItems) { apiList ->
+
+                        val currentFirebase = _allItems.value ?: emptyList()
+                        finalItemList.value = currentFirebase + apiList
+                    }
+                    _externalApiItems.value = mappedItems
+                }
+            } catch (e: Exception) {
+
             }
         }
     }
@@ -138,4 +172,7 @@ class MarketViewModel @Inject constructor(
             repository.removeFavorite(itemId)
         }
     }
+
+
+
 }

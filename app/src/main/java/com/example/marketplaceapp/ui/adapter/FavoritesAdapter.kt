@@ -44,22 +44,29 @@ class FavoritesAdapter(
         }
 
         fun bind(item: FavoriteItem) {
-            val context = itemView.context
-            binding.tvTitle.text = item.name
-            binding.tvPrice.text = context.getString(R.string.price_format, item.price.toString())
+            binding.apply {
+                val context = itemView.context
+                binding.tvTitle.text = item.name
+                binding.tvPrice.text =
+                    context.getString(R.string.price_format, item.price.toString())
 
-            binding.btnLike.visibility = View.GONE
-            binding.btnAddToCart.setImageResource(android.R.drawable.ic_menu_delete)
+                binding.btnLike.visibility = View.GONE
+                binding.btnAddToCart.setImageResource(android.R.drawable.ic_menu_delete)
 
-            val imageUri = item.imageUrl
-            if (imageUri != null) {
-                Glide.with(context)
-                    .load(imageUri.toUri())
-                    .placeholder(R.drawable.market_icon)
-                    .error(R.drawable.market_icon)
-                    .into(binding.ivItemImage)
-            } else {
-                binding.ivItemImage.setImageResource(R.drawable.market_icon)
+                val imageUri = item.imageUrl
+                if (imageUri != null) {
+                    Glide.with(context)
+                        .load(imageUri.toUri())
+                        .placeholder(R.drawable.market_icon)
+                        .error(R.drawable.market_icon)
+                        .into(binding.ivItemImage)
+                } else {
+                    binding.ivItemImage.setImageResource(R.drawable.market_icon)
+                }
+
+                root.setOnClickListener {
+                    onItemClick(item)
+                }
             }
         }
     }
