@@ -38,10 +38,13 @@
     <string name="location_added">Location Added!</string>
     <string name="current_location_attached">Current location attached</string>
     <string name="location_not_available">Location not available</string>
-    <string name="image_upload_failed">העלאת התמונה נכשלה</string>
-    <string name="please_fill_all_fields">נא למלא את כל השדות</string>
+    <string name="image_upload_failed">Image Upload Failed</string>
+    <string name="please_fill_all_fields">Please Fill All The Fileds</string>
     <string name="location_added_already">Location Added</string>
     <string name="product_images">product_images/%1$d.jpg</string>
+    <string name="global_store_add"> Add to Global Store</string>
+
+
 
     <!-- Categories -->
     <string name="category_books">Books</string>
@@ -55,6 +58,8 @@
     <string name="item_card_price_placeholder">$99.99</string>
     <string name="item_card_like_button_description">Like item</string>
     <string name="item_card_add_to_cart_button_description">Add to cart</string>
+    <string name="find_more_btn">Discover More Items</string>
+
 
     <!-- Favorites -->
     <string name="favorites">Favorites</string>

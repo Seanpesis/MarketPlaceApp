@@ -38,9 +38,11 @@ class ListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
+
         val adapter = MarketAdapter(
             onItemClick = { item ->
-                val action = ListFragmentDirections.actionListFragmentToDetailFragment(item.id)
+                val action = ListFragmentDirections.actionListFragmentToDetailFragment(item)
                 findNavController().navigate(action)
             },
             onAddToCartClick = { item ->
@@ -52,6 +54,17 @@ class ListFragment : Fragment() {
             },
             userLocation = viewModel.currentLocation.value
         )
+
+        binding.btnFetchApi.setOnClickListener {
+            viewModel.fetchExternalProducts()
+
+        }
+
+
+        viewModel.finalItemList.observe(viewLifecycleOwner) { items ->
+
+            adapter.submitList(items)
+        }
 
         binding.recyclerView.layoutManager = GridLayoutManager(context, 2)
         binding.recyclerView.adapter = adapter

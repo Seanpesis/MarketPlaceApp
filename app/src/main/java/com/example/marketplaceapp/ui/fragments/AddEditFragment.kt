@@ -28,6 +28,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+
 @AndroidEntryPoint
 class AddEditFragment : Fragment() {
 
@@ -131,6 +132,8 @@ class AddEditFragment : Fragment() {
         savingDialog = dialog
     }
 
+
+
     private fun saveItem(isEditMode: Boolean) {
         savingDialog?.show()
 
@@ -139,6 +142,7 @@ class AddEditFragment : Fragment() {
         val priceStr = binding.etPrice.text.toString().trim()
         val phone = binding.etPhone.text.toString().trim()
         val selectedCategory = binding.spinnerCategory.text.toString()
+        val isGlobal = binding.cbGlobalStore.isChecked
 
         if (title.isBlank() || desc.isBlank() || priceStr.isBlank() || phone.isBlank() || selectedCategory.isBlank()) {
             Toast.makeText(context, getString(R.string.please_fill_all_fields), Toast.LENGTH_SHORT).show()
@@ -156,7 +160,7 @@ class AddEditFragment : Fragment() {
                 storageRef.putFile(imageToUpload).addOnSuccessListener { _ ->
                     storageRef.downloadUrl.addOnSuccessListener { downloadedUri: Uri ->
                         val publicImageUrl = downloadedUri.toString()
-                        performSave(isEditMode, title, desc, price, phone, selectedCategory, publicImageUrl)
+                        performSave(isEditMode, title, desc, price, phone, selectedCategory, publicImageUrl,isGlobal)
                     }
                 }.addOnFailureListener { exception ->
                     Log.e("AddEditFragment", "Image upload failed", exception)
@@ -166,14 +170,15 @@ class AddEditFragment : Fragment() {
             }
         } else {
             val imageUriToSave = selectedImageUri?.toString()
-            performSave(isEditMode, title, desc, price, phone, selectedCategory, imageUriToSave)
+            performSave(isEditMode, title, desc, price, phone, selectedCategory, imageUriToSave, isGlobal)
+
         }
     }
 
 
-    private fun performSave(isEditMode: Boolean, title: String, desc: String, price: Double, phone: String, category: String, imageUri: String?) {
+    private fun performSave(isEditMode: Boolean, title: String, desc: String, price: Double, phone: String, category: String, imageUri: String?, isGlobal: Boolean ) {
         val itemToSave = MarketItem(
-            id = if (isEditMode) currentItem!!.id else "",
+            id = if (isEditMode) currentItem!!.id else java.util.UUID.randomUUID().toString(),
             title = title,
             description = desc,
             price = price,
@@ -182,25 +187,27 @@ class AddEditFragment : Fragment() {
             category = category,
             latitude = itemLocation?.latitude,
             longitude = itemLocation?.longitude
+
         )
 
-        lifecycleScope.launch {
-            val success = if (isEditMode) {
-                viewModel.update(itemToSave)
-            } else {
-                viewModel.insert(itemToSave)
-            }
-
-            if (success) {
-                delay(2000)
-                savingDialog?.dismiss()
-                findNavController().popBackStack()
-            } else {
-                savingDialog?.dismiss()
-                Toast.makeText(context, "Save failed. Check logs for details.", Toast.LENGTH_LONG).show()
+        viewModel.addItem(itemToSave, isGlobal) { success ->
+            lifecycleScope.launch {
+                if (success) {
+                    delay(2000)
+                    savingDialog?.dismiss()
+                    findNavController().popBackStack()
+                } else {
+                    savingDialog?.dismiss()
+                    Toast.makeText(
+                        context,
+                        "Save failed. Check logs for details.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
             }
         }
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

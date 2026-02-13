@@ -58,13 +58,6 @@ object AppModule {
             "marketplace_db"
         ).build()
     }
-
-    @Provides
-    @Singleton
-    fun provideProductDao(database: AppDatabase): ProductDao {
-        return database.productDao()
-    }
-
     @Provides
     @Singleton
     fun provideLocalDatabase(@ApplicationContext context: Context): LocalDatabase {

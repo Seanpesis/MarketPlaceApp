@@ -9,13 +9,22 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
+
+
 @Singleton
 class MarketRepository @Inject constructor(
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
+    private val apiService: FakeStoreApiService
 ) {
 
     private val itemsCollection = firestore.collection("items")
     private val favoritesCollection = firestore.collection("favorites")
+
+
+    suspend fun fetchApiProducts(): List<ApiProduct> {
+        return apiService.getAllProducts()
+    }
+
 
     fun getAllItems(): LiveData<List<MarketItem>> {
         val liveData = MutableLiveData<List<MarketItem>>()
@@ -40,6 +49,17 @@ class MarketRepository @Inject constructor(
         }
         return liveData
     }
+
+    suspend fun postNewProduct(product: ApiProduct): ApiProduct? {
+        return try {
+            apiService.addProduct(product)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+
+
 
     suspend fun insertItem(item: MarketItem): Boolean {
         return try {
@@ -128,4 +148,8 @@ class MarketRepository @Inject constructor(
              Log.w("MarketRepository", "Error removing favorite", e)
         }
     }
+
+
+
+
 }

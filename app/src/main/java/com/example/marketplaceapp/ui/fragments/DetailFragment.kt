@@ -35,6 +35,8 @@ class DetailFragment : Fragment() {
     private var deleteDialog: Dialog? = null
     private var addToCartDialog: Dialog? = null
 
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -48,43 +50,40 @@ class DetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.getItem(args.itemId).observe(viewLifecycleOwner) { item ->
-            item?.let { currentItemData ->
-                currentItem = currentItemData
-                binding.tvDetailTitle.text = currentItemData.title
-                binding.tvDetailPrice.text = getString(R.string.price_format, currentItemData.price.toString())
-                binding.tvDetailDescription.text = currentItemData.description
+            val item = args.marketItem
+            currentItem = item
 
-                currentItemData.imageUri?.let { uriString ->
-                    Glide.with(this)
-                        .load(uriString.toUri())
-                        .placeholder(R.drawable.market_icon)
-                        .error(R.drawable.market_icon)
-                        .into(binding.ivDetailImage)
-                } ?: binding.ivDetailImage.setImageResource(R.drawable.market_icon)
 
-                val userLocation = viewModel.currentLocation.value
-                val lat = currentItemData.latitude
-                val lon = currentItemData.longitude
-                if (userLocation != null && lat != null && lon != null) {
-                    val itemLocation = Location("").apply {
-                        latitude = lat
-                        longitude = lon
-                    }
-                    val distanceInMeters = userLocation.distanceTo(itemLocation)
-                    val distanceInKm = distanceInMeters / 1000
-                    binding.tvDetailDistance.text = String.format(Locale.getDefault(), getString(R.string.distance_format), distanceInKm)
-                    binding.tvDetailDistance.visibility = View.VISIBLE
-                } else {
-                    binding.tvDetailDistance.visibility = View.GONE
+            binding.tvDetailTitle.text = item.title
+            binding.tvDetailDescription.text = item.description
+            binding.tvDetailPrice.text = "${item.price} $"
+
+
+            Glide.with(this)
+                .load(item.imageUri)
+                .placeholder(R.drawable.market_icon)
+                .error(R.drawable.market_icon)
+                .into(binding.ivDetailImage)
+
+
+            val userLocation = viewModel.currentLocation.value
+            if (userLocation != null && item.latitude != null && item.longitude != null) {
+                val itemLocation = Location("").apply {
+                    latitude = item.latitude!!
+                    longitude = item.longitude!!
                 }
+                val distanceInKm = userLocation.distanceTo(itemLocation) / 1000
+                binding.tvDetailDistance.text = String.format(Locale.getDefault(), "%.1f km away", distanceInKm)
+                binding.tvDetailDistance.visibility = View.VISIBLE
+            } else {
+                binding.tvDetailDistance.visibility = View.GONE
             }
-        }
 
-        binding.btnEdit.setOnClickListener {
-            val action = DetailFragmentDirections.actionDetailFragmentToAddEditFragment(args.itemId)
-            findNavController().navigate(action)
-        }
+
+            binding.btnEdit.setOnClickListener {
+                val action = DetailFragmentDirections.actionDetailFragmentToAddEditFragment(item.id)
+                findNavController().navigate(action)
+                }
 
         binding.btnDelete.setOnClickListener {
             showDeleteConfirmationDialog()

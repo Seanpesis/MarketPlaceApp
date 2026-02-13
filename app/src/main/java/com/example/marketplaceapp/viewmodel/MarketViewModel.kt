@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import com.example.marketplaceapp.data.ApiProduct
 
 @HiltViewModel
 class MarketViewModel @Inject constructor(
@@ -42,11 +43,32 @@ class MarketViewModel @Inject constructor(
         finalItemList.addSource(_allItems) { items -> combineFilterAndSort(items, _currentLocation.value, _filterCategory.value) }
         finalItemList.addSource(_currentLocation) { location -> combineFilterAndSort(_allItems.value, location, _filterCategory.value) }
         finalItemList.addSource(_filterCategory) { category -> combineFilterAndSort(_allItems.value, _currentLocation.value, category) }
+        finalItemList.addSource(_externalApiItems) { apiItems ->
+            combineFilterAndSort(_allItems.value, _currentLocation.value, _filterCategory.value)
+
+    }
     }
 
     private fun combineFilterAndSort(items: List<MarketItem>?, location: Location?, category: String?) {
         viewModelScope.launch(Dispatchers.Default) {
-            val currentItems = items ?: return@launch
+
+
+            val firebaseItems = items ?: emptyList()
+
+
+            val apiItems = _externalApiItems.value ?: emptyList()
+
+
+            val currentItems = firebaseItems + apiItems
+
+
+            if (currentItems.isEmpty()) {
+                withContext(Dispatchers.Main) {
+                    finalItemList.value = emptyList()
+                }
+                return@launch
+            }
+
 
             val filteredItems = if (category == null || category == "All") {
                 currentItems
@@ -54,22 +76,27 @@ class MarketViewModel @Inject constructor(
                 currentItems.filter { it.category.equals(category, ignoreCase = true) }
             }
 
+
             val sortedItems = if (location == null) {
                 filteredItems
             } else {
                 filteredItems.sortedBy { item ->
-                    item.latitude?.let { lat ->
-                        item.longitude?.let { lon ->
-                            val itemLocation = Location("").apply {
-                                latitude = lat
-                                longitude = lon
-                            }
-                            return@sortedBy location.distanceTo(itemLocation)
+
+                    val lat = item.latitude
+                    val lon = item.longitude
+
+                    if (lat != null && lon != null && lat != 0.0) {
+                        val itemLocation = Location("").apply {
+                            latitude = lat
+                            longitude = lon
                         }
+                        location.distanceTo(itemLocation)
+                    } else {
+                        Float.MAX_VALUE
                     }
-                    Float.MAX_VALUE
                 }
             }
+
             withContext(Dispatchers.Main) {
                 finalItemList.value = sortedItems
             }
@@ -77,32 +104,27 @@ class MarketViewModel @Inject constructor(
     }
 
     fun fetchExternalProducts() {
-        viewModelScope.launch(Dispatchers.IO) { // הרצה ברקע
+        viewModelScope.launch(Dispatchers.IO) {
             try {
-                // הבאת המוצרים מהשרת
                 val apiProducts = repository.fetchApiProducts()
-
-                // המרה של ApiProduct ל-MarketItem כדי שיתאימו לרשימה שלך
-                val mappedItems = apiProducts.map { apiProd ->
+                val mappedItems = apiProducts.map { apiProd: ApiProduct ->
                     MarketItem(
-                        id = apiProd.id.toString(),
+                        id = "api_${apiProd.id}",
                         title = apiProd.title,
                         price = apiProd.price,
-                        category = apiProd.category,
-                        imageUri = apiProd.image, // Glide יטען את הכתובת הזו
+                        category = when(apiProd.category) {
+                            "electronics" -> "Technology"
+                            "men's clothing", "women's clothing" -> "Clothing"
+                            else -> "All"
+                        },
+                        imageUri = apiProd.image,
                         description = apiProd.description
                     )
                 }
-                withContext(Dispatchers.Main) {
 
-                    finalItemList.addSource(_externalApiItems) { apiList ->
-
-                        val currentFirebase = _allItems.value ?: emptyList()
-                        finalItemList.value = currentFirebase + apiList
-                    }
-                    _externalApiItems.value = mappedItems
-                }
+                _externalApiItems.postValue(mappedItems)
             } catch (e: Exception) {
+                android.util.Log.e("API_ERROR", "Failed to fetch products: ${e.message}")
 
             }
         }
@@ -135,6 +157,48 @@ class MarketViewModel @Inject constructor(
     suspend fun delete(itemId: String): Boolean {
         return repository.deleteItem(itemId)
     }
+
+
+
+    fun addItem(
+        item: MarketItem,
+        addToGlobalStore: Boolean,
+        onComplete: (Boolean) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val localSuccess = repository.insertItem(item)
+
+
+                if (addToGlobalStore) {
+                    val apiProduct = ApiProduct(
+                        id = 0,
+                        title = item.title,
+                        price = item.price,
+                        description = item.description ?: "",
+                        category = item.category,
+                        image = item.imageUri ?: ""
+                    )
+
+                    val apiResult = repository.postNewProduct(apiProduct)
+
+                    if (apiResult != null) {
+                        android.util.Log.d("API_POST", "Successfully posted to Global Store: ${apiResult.id}")
+                    }
+                }
+
+                withContext(Dispatchers.Main) {
+                    onComplete(localSuccess)
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("ADD_ITEM_ERROR", e.message ?: "Unknown error")
+                withContext(Dispatchers.Main) {
+                    onComplete(false)
+                }
+            }
+        }
+    }
+
 
     fun addToCart(marketItem: MarketItem) {
         CartManager.addToCart(marketItem)

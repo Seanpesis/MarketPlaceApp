@@ -1,5 +1,6 @@
 package com.example.marketplaceapp.data
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 
@@ -16,4 +17,10 @@ interface ProductDao {
 
     @Query("SELECT EXISTS(SELECT * FROM favorites_table WHERE id = :productId)")
     suspend fun isFavorite(productId: String): Boolean
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(item: MarketItem)
+
+    @Query("SELECT * FROM market_items_table")
+    fun getAllProducts(): LiveData<List<MarketItem>>
 }
