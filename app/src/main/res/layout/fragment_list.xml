@@ -48,6 +48,13 @@
                 android:text="@string/clothing_btn" />
 
             <com.google.android.material.chip.Chip
+                android:id="@+id/btnFilterJewelery"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/jewelery_btn" />
+
+            <com.google.android.material.chip.Chip
                 android:id="@+id/btnFilterArt"
                 style="@style/Widget.Material3.Chip.Filter"
                 android:layout_width="wrap_content"

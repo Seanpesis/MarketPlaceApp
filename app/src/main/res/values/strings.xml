@@ -25,6 +25,10 @@
     <string name="books_btn">Books</string>
     <string name="clothing_btn">Clothing</string>
     <string name="art_btn">Art</string>
+    <string name="technology_btn">Technology</string>
+    <string name="jewelery_btn">Jewelery</string>
+
+
 
     <!-- Shopping Cart -->
     <string name="shopping_cart">Shopping Cart</string>
@@ -52,6 +56,8 @@
     <string name="category_art">Art</string>
     <string name="category_technology">Technology</string>
     <string name="category_general">General</string>
+    <string name="category_jewelery">Jewelery</string>
+
 
     <!-- Item Card Placeholders and Content Descriptions -->
     <string name="item_card_product_name_placeholder">Product Name</string>

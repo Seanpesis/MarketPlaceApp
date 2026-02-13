@@ -93,6 +93,7 @@ class ListFragment : Fragment() {
                 R.id.btnFilterClothing -> "Clothing"
                 R.id.btnFilterArt -> "Art"
                 R.id.btnFilterTechnology -> "Technology"
+                R.id.btnFilterJewelery -> "Jewelery"
                 else -> "All"
             }
             viewModel.setFilter(category)

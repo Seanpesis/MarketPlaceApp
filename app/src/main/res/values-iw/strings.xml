@@ -1,38 +1,61 @@
 <resources>
-    <string name="app_name">שוק</string>
+    <string name="app_name">MarketPlace</string>
     <string name="title">כותרת</string>
     <string name="price">מחיר</string>
     <string name="description">תיאור</string>
     <string name="phone">טלפון</string>
-    <string name="save">שמור</string>
-    <string name="edit">ערוך</string>
-    <string name="select_image">בחר תמונה</string>
+    <string name="save">שמירה</string>
+    <string name="edit">עריכה</string>
+    <string name="select_image">בחירת תמונה</string>
     <string name="contact_info">פרטי קשר</string>
-    <string name="fill_fields">אנא מלא את כל השדות</string>
 
-    <!-- Delete Dialog -->
-    <string name="delete_dialog_title">מחק פריט</string>
-    <string name="delete_dialog_message">האם אתה בטוח שברצונך למחוק את \"%1$s\"?</string>
-    <string name="delete_confirm">מחק</string>
+    <string name="delete_dialog_title">מחיקת פריט</string>
+    <string name="delete_dialog_message">האם את בטוחה שברצונך למחוק את \"%1$s\"?</string>
+    <string name="delete_confirm">מחיקה</string>
     <string name="cancel">ביטול</string>
-
-    <!-- Formatting -->
-    <string name="price_format">%1$s ₪</string>
-
-    <!--    Home Page Categories -->
-    <string name="all_btn">הכל</string>
-    <string name="books_btn">ספרים</string>
-    <string name="clothing_btn">בגדים</string>
-    <string name="art_btn">אומנות</string>
-
-    <!-- Menu -->
     <string name="about">אודות</string>
 
-    <!-- Shopping Cart -->
+    <string name="price_format">%1$s $</string>
+    <string name="distance_format">%.1f ק\"מ ממך</string>
+
+    <string name="all_btn">הכל</string>
+    <string name="books_btn">ספרים</string>
+    <string name="clothing_btn">ביגוד</string>
+    <string name="art_btn">אמנות</string>
+    <string name="technology_btn">טכנולוגיה</string>
+    <string name="jewelery_btn">תכשיטים</string>
+
     <string name="shopping_cart">עגלת קניות</string>
     <string name="proceed_to_payment">המשך לתשלום</string>
     <string name="checkout_summary">סיכום הזמנה</string>
-    <string name="checkout_details">סה"כ פריטים: %1$d\nמחיר סופי: ₪%.2f</string>
+    <string name="checkout_details">סה\"כ פריטים: %1$d\nמחיר כולל: %2$.2f $</string>
     <string name="ok">אישור</string>
-    <string name="total_price_format">סה"כ: ₪%.2f</string>
+    <string name="total_price_format">סה\"כ: $%.2f</string>
+
+    <string name="location_added">המיקום נוסף!</string>
+    <string name="current_location_attached">מיקום נוכחי צורף</string>
+    <string name="location_not_available">מיקום אינו זמין</string>
+    <string name="image_upload_failed">העלאת התמונה נכשלה</string>
+    <string name="please_fill_all_fields">נא למלא את כל השדות</string>
+    <string name="location_added_already">המיקום כבר נוסף</string>
+    <string name="product_images">product_images/%1$d.jpg</string>
+    <string name="global_store_add">הוספה לחנות הגלובלית</string>
+
+    <string name="category_books">ספרים</string>
+    <string name="category_clothing">ביגוד</string>
+    <string name="category_art">אמנות</string>
+    <string name="category_technology">טכנולוגיה</string>
+    <string name="category_general">כללי</string>
+    <string name="category_jewelery">תכשיטים</string>
+
+    <string name="item_card_product_name_placeholder">שם המוצר</string>
+    <string name="item_card_price_placeholder">$99.99</string>
+    <string name="item_card_like_button_description">סימון כאהוב</string>
+    <string name="item_card_add_to_cart_button_description">הוספה לעגלה</string>
+    <string name="find_more_btn">גלה מוצרים נוספים</string>
+
+    <string name="favorites">מועדפים</string>
+
+    <string name="item_deleted_successfully">הפריט נמחק בהצלחה</string>
+    <string name="delete_failed">המחיקה נכשלה. בדקי את התיעוד.</string>
 </resources>

@@ -4,4 +4,10 @@
         <item>@font/assistant</item>
         <item>@font/assistant_bold</item>
     </array>
+    <string-array name="categories">
+        <item>All</item>
+        <item>Technology</item>
+        <item>Clothing</item>
+        <item>Jewelry</item>
+    </string-array>
 </resources>

@@ -105,6 +105,7 @@ class MarketViewModel @Inject constructor(
                         category = when(apiProd.category) {
                             "electronics" -> "Technology"
                             "men's clothing", "women's clothing" -> "Clothing"
+                            "jewelery" -> "Jewelery"
                             else -> "All"
                         },
                         imageUri = apiProd.image,
@@ -142,6 +143,7 @@ class MarketViewModel @Inject constructor(
                             category = when(apiProduct.category) {
                                 "electronics" -> "Technology"
                                 "men's clothing", "women's clothing" -> "Clothing"
+                                "jewelery" -> "Jewelery"
                                 else -> "All"
                             },
                             imageUri = apiProduct.image,
@@ -153,7 +155,7 @@ class MarketViewModel @Inject constructor(
                     }
                 } catch (e: NumberFormatException) {
                     Log.w("MarketViewModel", "Invalid API ID format in getItem", e)
-                    itemLiveData.postValue(null) // Invalid ID format
+                    itemLiveData.postValue(null)
                 }
             } else {
                 itemLiveData.postValue(repository.getItem(itemId))

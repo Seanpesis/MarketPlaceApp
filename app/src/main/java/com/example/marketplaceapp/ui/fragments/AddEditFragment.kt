@@ -68,10 +68,12 @@ class AddEditFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val categories = arrayOf(
+            getString(R.string.category_general),
             getString(R.string.category_books),
             getString(R.string.category_clothing),
             getString(R.string.category_art),
-            getString(R.string.category_technology)
+            getString(R.string.category_technology),
+            getString(R.string.category_jewelery)
         )
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, categories)
         binding.spinnerCategory.setAdapter(adapter)
