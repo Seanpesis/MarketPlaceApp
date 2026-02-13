@@ -2,6 +2,7 @@ package com.example.marketplaceapp.viewmodel
 
 import android.app.Application
 import android.location.Location
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
@@ -43,24 +44,16 @@ class MarketViewModel @Inject constructor(
         finalItemList.addSource(_allItems) { items -> combineFilterAndSort(items, _currentLocation.value, _filterCategory.value) }
         finalItemList.addSource(_currentLocation) { location -> combineFilterAndSort(_allItems.value, location, _filterCategory.value) }
         finalItemList.addSource(_filterCategory) { category -> combineFilterAndSort(_allItems.value, _currentLocation.value, category) }
-        finalItemList.addSource(_externalApiItems) { apiItems ->
+        finalItemList.addSource(_externalApiItems) { _ ->
             combineFilterAndSort(_allItems.value, _currentLocation.value, _filterCategory.value)
-
-    }
+        }
     }
 
     private fun combineFilterAndSort(items: List<MarketItem>?, location: Location?, category: String?) {
         viewModelScope.launch(Dispatchers.Default) {
-
-
             val firebaseItems = items ?: emptyList()
-
-
             val apiItems = _externalApiItems.value ?: emptyList()
-
-
             val currentItems = firebaseItems + apiItems
-
 
             if (currentItems.isEmpty()) {
                 withContext(Dispatchers.Main) {
@@ -69,19 +62,16 @@ class MarketViewModel @Inject constructor(
                 return@launch
             }
 
-
             val filteredItems = if (category == null || category == "All") {
                 currentItems
             } else {
                 currentItems.filter { it.category.equals(category, ignoreCase = true) }
             }
 
-
             val sortedItems = if (location == null) {
                 filteredItems
             } else {
                 filteredItems.sortedBy { item ->
-
                     val lat = item.latitude
                     val lon = item.longitude
 
@@ -124,8 +114,7 @@ class MarketViewModel @Inject constructor(
 
                 _externalApiItems.postValue(mappedItems)
             } catch (e: Exception) {
-                android.util.Log.e("API_ERROR", "Failed to fetch products: ${e.message}")
-
+                Log.e("API_ERROR", "Failed to fetch products", e)
             }
         }
     }
@@ -141,24 +130,41 @@ class MarketViewModel @Inject constructor(
     fun getItem(itemId: String): LiveData<MarketItem?> {
         val itemLiveData = MutableLiveData<MarketItem?>()
         viewModelScope.launch {
-            itemLiveData.postValue(repository.getItem(itemId))
+            if (itemId.startsWith("api_")) {
+                try {
+                    val apiId = itemId.removePrefix("api_").toInt()
+                    val apiProduct = repository.getApiProduct(apiId)
+                    if (apiProduct != null) {
+                        val marketItem = MarketItem(
+                            id = "api_${apiProduct.id}",
+                            title = apiProduct.title,
+                            price = apiProduct.price,
+                            category = when(apiProduct.category) {
+                                "electronics" -> "Technology"
+                                "men's clothing", "women's clothing" -> "Clothing"
+                                else -> "All"
+                            },
+                            imageUri = apiProduct.image,
+                            description = apiProduct.description
+                        )
+                        itemLiveData.postValue(marketItem)
+                    } else {
+                        itemLiveData.postValue(null)
+                    }
+                } catch (e: NumberFormatException) {
+                    Log.w("MarketViewModel", "Invalid API ID format in getItem", e)
+                    itemLiveData.postValue(null) // Invalid ID format
+                }
+            } else {
+                itemLiveData.postValue(repository.getItem(itemId))
+            }
         }
         return itemLiveData
-    }
-
-    suspend fun insert(item: MarketItem): Boolean {
-        return repository.insertItem(item)
-    }
-
-    suspend fun update(item: MarketItem): Boolean {
-        return repository.updateItem(item)
     }
 
     suspend fun delete(itemId: String): Boolean {
         return repository.deleteItem(itemId)
     }
-
-
 
     fun addItem(
         item: MarketItem,
@@ -169,13 +175,12 @@ class MarketViewModel @Inject constructor(
             try {
                 val localSuccess = repository.insertItem(item)
 
-
                 if (addToGlobalStore) {
                     val apiProduct = ApiProduct(
                         id = 0,
                         title = item.title,
                         price = item.price,
-                        description = item.description ?: "",
+                        description = item.description,
                         category = item.category,
                         image = item.imageUri ?: ""
                     )
@@ -183,7 +188,7 @@ class MarketViewModel @Inject constructor(
                     val apiResult = repository.postNewProduct(apiProduct)
 
                     if (apiResult != null) {
-                        android.util.Log.d("API_POST", "Successfully posted to Global Store: ${apiResult.id}")
+                        Log.d("API_POST", "Successfully posted to Global Store: ${apiResult.id}")
                     }
                 }
 
@@ -191,14 +196,13 @@ class MarketViewModel @Inject constructor(
                     onComplete(localSuccess)
                 }
             } catch (e: Exception) {
-                android.util.Log.e("ADD_ITEM_ERROR", e.message ?: "Unknown error")
+                Log.e("ADD_ITEM_ERROR", "Error in addItem", e)
                 withContext(Dispatchers.Main) {
                     onComplete(false)
                 }
             }
         }
     }
-
 
     fun addToCart(marketItem: MarketItem) {
         CartManager.addToCart(marketItem)
@@ -211,7 +215,7 @@ class MarketViewModel @Inject constructor(
     fun clearCart() {
         CartManager.clearCart()
     }
-    
+
     fun toggleFavorite(item: MarketItem) {
         viewModelScope.launch {
             if (item.id.isEmpty()) return@launch
@@ -236,7 +240,4 @@ class MarketViewModel @Inject constructor(
             repository.removeFavorite(itemId)
         }
     }
-
-
-
 }

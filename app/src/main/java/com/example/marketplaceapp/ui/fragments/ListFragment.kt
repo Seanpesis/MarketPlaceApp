@@ -42,7 +42,7 @@ class ListFragment : Fragment() {
 
         val adapter = MarketAdapter(
             onItemClick = { item ->
-                val action = ListFragmentDirections.actionListFragmentToDetailFragment(item)
+                val action = ListFragmentDirections.actionListFragmentToDetailFragment(item.id)
                 findNavController().navigate(action)
             },
             onAddToCartClick = { item ->

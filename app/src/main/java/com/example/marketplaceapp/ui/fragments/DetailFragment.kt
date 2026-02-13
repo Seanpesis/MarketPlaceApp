@@ -50,21 +50,24 @@ class DetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-            val item = args.marketItem
+        viewModel.getItem(args.itemId).observe(viewLifecycleOwner) { item ->
+            if (item == null) {
+                // Handle item not found
+                Toast.makeText(context, "Item not found", Toast.LENGTH_LONG).show()
+                findNavController().popBackStack()
+                return@observe
+            }
             currentItem = item
-
 
             binding.tvDetailTitle.text = item.title
             binding.tvDetailDescription.text = item.description
             binding.tvDetailPrice.text = "${item.price} $"
-
 
             Glide.with(this)
                 .load(item.imageUri)
                 .placeholder(R.drawable.market_icon)
                 .error(R.drawable.market_icon)
                 .into(binding.ivDetailImage)
-
 
             val userLocation = viewModel.currentLocation.value
             if (userLocation != null && item.latitude != null && item.longitude != null) {
@@ -79,11 +82,11 @@ class DetailFragment : Fragment() {
                 binding.tvDetailDistance.visibility = View.GONE
             }
 
-
             binding.btnEdit.setOnClickListener {
                 val action = DetailFragmentDirections.actionDetailFragmentToAddEditFragment(item.id)
                 findNavController().navigate(action)
-                }
+            }
+        }
 
         binding.btnDelete.setOnClickListener {
             showDeleteConfirmationDialog()
@@ -114,7 +117,7 @@ class DetailFragment : Fragment() {
     private fun showAddToCartAnimation() {
         lifecycleScope.launch {
             addToCartDialog?.show()
-            delay(1500) 
+            delay(1500)
             addToCartDialog?.dismiss()
         }
     }

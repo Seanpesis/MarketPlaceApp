@@ -4,6 +4,7 @@ package com.example.marketplaceapp.data
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Body
+import retrofit2.http.Path
 
 interface FakeStoreApiService {
     @GET("carts")
@@ -11,6 +12,9 @@ interface FakeStoreApiService {
 
     @GET("products")
     suspend fun getAllProducts(): List<ApiProduct>
+
+    @GET("products/{id}")
+    suspend fun getProductById(@Path("id") id: Int): ApiProduct
 
     @POST("products")
     suspend fun addProduct(@Body product: ApiProduct): ApiProduct

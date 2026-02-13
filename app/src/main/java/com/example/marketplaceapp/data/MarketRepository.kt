@@ -25,6 +25,14 @@ class MarketRepository @Inject constructor(
         return apiService.getAllProducts()
     }
 
+    suspend fun getApiProduct(id: Int): ApiProduct? {
+        return try {
+            apiService.getProductById(id)
+        } catch (e: Exception) {
+            Log.e("MarketRepository", "Error fetching single product from API", e)
+            null
+        }
+    }
 
     fun getAllItems(): LiveData<List<MarketItem>> {
         val liveData = MutableLiveData<List<MarketItem>>()

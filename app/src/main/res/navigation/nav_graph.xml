@@ -41,8 +41,8 @@
             android:id="@+id/action_detailFragment_to_addEditFragment"
             app:destination="@id/addEditFragment" />
         <argument
-            android:name="marketItem"
-            app:argType="com.example.marketplaceapp.data.MarketItem" />
+            android:name="itemId"
+            app:argType="string" />
     </fragment>
 
     <fragment
