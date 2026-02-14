@@ -17,12 +17,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Version 1.0" />
+        android:text="@string/version" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Created by Loren , Linoy and Sean" />
+        android:text="@string/created_by" />
 
 </LinearLayout>

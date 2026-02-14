@@ -31,6 +31,9 @@
     <string name="checkout_details">סה\"כ פריטים: %1$d\nמחיר כולל: %2$.2f $</string>
     <string name="ok">אישור</string>
     <string name="total_price_format">סה\"כ: $%.2f</string>
+    <string name="quantity">כמות</string>
+    <string name="product_name">שם המוצר</string>
+    <string name="checkout_succes"> הרכישה הושלמה!</string>
 
     <string name="location_added">המיקום נוסף!</string>
     <string name="current_location_attached">מיקום נוכחי צורף</string>
@@ -40,7 +43,11 @@
     <string name="location_added_already">המיקום כבר נוסף</string>
     <string name="product_images">product_images/%1$d.jpg</string>
     <string name="global_store_add">הוספה לחנות הגלובלית</string>
+    <string name="save_failed"> ההוספה נכשלה. צפה בLog לפרטים נוספים</string>
+    <string name="km_away">ק״מ ממך</string>
 
+
+    <string name="category">קטגוריה</string>
     <string name="category_books">ספרים</string>
     <string name="category_clothing">ביגוד</string>
     <string name="category_art">אמנות</string>
@@ -53,8 +60,13 @@
     <string name="item_card_like_button_description">סימון כאהוב</string>
     <string name="item_card_add_to_cart_button_description">הוספה לעגלה</string>
     <string name="find_more_btn">גלה מוצרים נוספים</string>
+    <string name="add_location_btn">הוסף מיקום</string>
+
+
 
     <string name="favorites">מועדפים</string>
+    <string name="version">גרסה 2.0</string>
+    <string name="created_by">נוצר על ידי לורן, לינוי ושון</string>
 
     <string name="item_deleted_successfully">הפריט נמחק בהצלחה</string>
     <string name="delete_failed">המחיקה נכשלה. בדקי את התיעוד.</string>

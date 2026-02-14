@@ -51,7 +51,7 @@
                     android:gravity="center_vertical"
                     android:textAppearance="?attr/textAppearanceBodyMedium"
                     app:drawableStartCompat="@android:drawable/ic_dialog_map"
-                    tools:text="2.5 km away" />
+                    tools:text="@string/km_away" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -106,7 +106,7 @@
                 android:id="@+id/btnAddToCartFromDetail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Add to Cart"
+                android:text="@string/item_card_add_to_cart_button_description"
                 android:paddingStart="32dp"
                 android:paddingEnd="32dp"
                 app:icon="@android:drawable/ic_input_add"

@@ -78,7 +78,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:hint="Category">
+            android:hint="@string/category">
 
             <AutoCompleteTextView
                 android:id="@+id/spinnerCategory"
@@ -114,14 +114,14 @@
                 style="@style/Widget.Material3.Button.TonalButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Add Location"/>
+                android:text="@string/add_location_btn"/>
 
             <TextView
                 android:id="@+id/tvLocationStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                tools:text="Location Added!"/>
+                tools:text="@string/location_added"/>
 
 
         </LinearLayout>
@@ -130,7 +130,7 @@
             android:id="@+id/cbGlobalStore"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Add to Global Store"
+            android:text="@string/global_store_add"
             android:layout_marginTop="8dp"
             app:buttonTint="@color/brand_primary" />
 

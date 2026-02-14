@@ -202,7 +202,7 @@ class AddEditFragment : Fragment() {
                     savingDialog?.dismiss()
                     Toast.makeText(
                         context,
-                        "Save failed. Check logs for details.",
+                        getString(R.string.save_failed),
                         Toast.LENGTH_LONG
                     ).show()
                 }

@@ -125,7 +125,7 @@ class CartFragment : Fragment() {
             viewModel.clearCart()
             delay(2500)
             checkoutDialog?.dismiss()
-            Toast.makeText(context, "Checkout successful!", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, getString(R.string.checkout_succes), Toast.LENGTH_LONG).show()
         }
     }
 

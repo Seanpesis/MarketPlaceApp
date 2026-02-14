@@ -76,7 +76,7 @@ class DetailFragment : Fragment() {
                     longitude = item.longitude!!
                 }
                 val distanceInKm = userLocation.distanceTo(itemLocation) / 1000
-                binding.tvDetailDistance.text = String.format(Locale.getDefault(), "%.1f km away", distanceInKm)
+                binding.tvDetailDistance.text = String.format(Locale.getDefault(), "%.1f  " + getString(R.string.km_away), distanceInKm)
                 binding.tvDetailDistance.visibility = View.VISIBLE
             } else {
                 binding.tvDetailDistance.visibility = View.GONE
