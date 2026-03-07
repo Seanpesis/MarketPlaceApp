@@ -94,4 +94,7 @@ git clone [https://github.com/Seanpesis/MarketPlaceApp.git](https://github.com/S
 הריצו את האפליקציה על אימולטור או מכשיר פיזי (מינימום SDK 24).
 
 
+לצפייה באפליקציה:
+https://www.youtube.com/shorts/Fp416FRaqDQ
+
 
